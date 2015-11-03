@@ -6,4 +6,62 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
+-- create database tournament;
 
+create table players (
+id serial primary key,
+name text);
+
+-- stores results of matches. two rows for a normal match (w/l/d), one row for a bye (b)
+create table matchresults (
+id serial primary key,
+matchid smallint,
+playerid serial references players (id),
+result text
+);
+
+-- counts the number of wins each player has for view 'playerstandings.' a bye counts as a win.
+create view wins AS
+select players.id as playerid, count(matchresults.result) as wins
+from players, matchresults
+where players.id = matchresults.playerid
+and matchresults.result in ('w', 'b')
+group by players.id;
+
+-- counts the number of matches each player has played for view 'playerstandings'
+create view matchesplayed AS
+select players.id as playerid, count(matchid) as matchesplayed
+from players, matchresults
+where players.id = matchresults.playerid
+group by players.id;
+
+-- shows the opponents for each player
+-- used to look up OMW (Opponent Match Wins), the total number of wins by players they have played against.
+create view opponents AS
+select a.playerid as player, b.playerid as opponent
+from matchresults as a, matchresults as b
+where a.matchid = b.matchid
+and a.playerid != b.playerid
+order by a.playerid;
+
+-- for debugging, ignore
+-- #select a.playerid, a.result, b.playerid, b.result, a.matchid, b.matchid
+
+
+create view omw AS
+select opponents.player, sum(wins.wins) as opponentwins
+from opponents, wins
+where wins.playerid = opponents.opponent
+group by player;
+
+-- playerstandings shows player id, player name, wins, matchesplayed, and opponent wins
+create view playerstandings AS
+select players.id, players.name, COALESCE(wins, 0) as wins, COALESCE (matchesplayed, 0) as matchesplayed, COALESCE (opponentwins, 0) as opponentwins
+from players
+left join wins
+on players.id = wins.playerid
+left join matchesplayed
+on matchesplayed.playerid = players.id
+left join omw
+on matchesplayed.playerid = omw.player
+order by wins DESC, opponentwins DESC;
