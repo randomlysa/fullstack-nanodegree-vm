@@ -38,7 +38,7 @@ def countPlayers():
 
 
 
-def registerPlayer(name):
+def registerPlayer(name, tid):
     """Adds a player to the tournament database.
 
     The database assigns a unique serial id number for the player.  (This
@@ -46,10 +46,11 @@ def registerPlayer(name):
 
     Args:
       name: the player's full name (need not be unique).
+      tid = tournament id (the tournament must already be created)
     """
     conn = psycopg2.connect("dbname=tournament")
     c = conn.cursor();
-    c.execute("INSERT INTO players (name) VALUES (%s)", (name,))
+    c.execute("INSERT INTO players (name, tournamentid) VALUES (%s, %s)", (name, tid,))
     conn.commit()
 
 
@@ -133,8 +134,8 @@ def swissPairings():
     conn = psycopg2.connect("dbname=tournament")
     c = conn.cursor();
     
-
-    c.execute("select id, name from playerstandings");
+    # this is the select that is used for an even number of players
+    c.execute("select id, name, wins from playerstandings");
     playerCount = c.rowcount
     
     # if playerCount is an odd number, 
@@ -145,6 +146,7 @@ def swissPairings():
         
     
     if playerCount % 2 != 0:
+        ##print "odd number of players"
         # get list of players who have not had a bye
         c.execute(" \
         select players.id \
@@ -159,62 +161,61 @@ def swissPairings():
         playersWithoutByeCount = c.rowcount
 
         rows = c.fetchall()
-        '''
-        Debugging
-        print "list of players without a bye"
-        print rows;
         
-        print "number of players without a bye"
-        print playersWithoutByeCount
-        '''
+        ## Debugging
+        ## print "list of players without a bye"
+        ## print rows;
+        
+        ## print "number of players without a bye"
+        ## print playersWithoutByeCount
+        
         # assign a bye to one of those players.
         from random import randint
         pickPlayerForBye = randint(0, playersWithoutByeCount - 1)
         
-        '''
-        print pickPlayerForBye
-        print "Player picked for bye is..."
-        '''
+        
+        ## print "Player picked for bye is..."
+        ## print pickPlayerForBye
+        
         # set this playerid to be currentBye
         currentBye = rows[pickPlayerForBye]
         # report currentBye as a bye
         reportMatch(currentBye, 'b')
         
         ## print "Skipping"
-        ## print currentBye
+        ## print currentBye        
         
-        # select all the players 
-        # select the remaining players to be paired (excluding currentBye)
-        c.execute(" \
-        select \
-            distinct players.id, players.name \
-        from \
-            players \
-        left join \
-            matchresults \
-        on \
-            players.id = matchresults.playerid \
-        where \
-            players.id !=  '%s' \
-            ", currentBye)
+        # get all players (for odd number of players, skips player who was assigned a bye for this round)
+        # this is the select that is used for an odd number of players
+        # not sure why this query is like this - can i make it simpler?
+        '''
+            c.execute(" \
+            select \
+                distinct players.id, players.name \
+                from players \
+                left join matchresults \
+                on players.id = matchresults.playerid \
+                where players.id !=  '%s' \
+                ", currentBye)            
             
+            rows = c.fetchall()
         '''
-        rows = c.fetchall()
-        thisResult = c.rowcount
-        print "Row 201"
-        print thisResult 
-        '''
+
+        c.execute ("select id, name \
+            from playerstandings \
+            where id !=  '%s' \
+            ", currentBye)
+        
+        
     
+    # get all players (for even or odd number of players)
     rows = c.fetchall()
-    thisResult = c.rowcount
-    ##print "Row 206"
-    ##print thisResult
-    ##print rows
-    
-    # get names and ids of all players and put them into a list to work with later    
+    # debugging
+    # thisResult = c.rowcount
     
     ids = list()
     names = list()
+    # get names and ids of all players and put (append) them into a list to work with later    
     for row in rows:
         ids.append(row[0])
         names.append(row[1])
