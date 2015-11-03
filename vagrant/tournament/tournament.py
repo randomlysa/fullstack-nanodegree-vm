@@ -88,12 +88,19 @@ def reportMatch(player1, result1, player2=0, result2=0):
       player2 and result2 are set to 0 by default so a 'bye' week reportMatch doesn't need 4 arguments, only two.
       
       matchresults table:
-        id = unique id
-        match id = normal matches have two rows that have the same match id. bye weeks have one row.
-        result = w/l/d/b
+        id: unique id (serial)
+        match id: normal matches have two rows that have the same match id. bye weeks have one row.
+        playerid: id of the player
+        result: w/l/d/b
+        tournamentid: which tournament is this match played in. this is determined automatically by finding the id of 
+            the active tournament
     """
     conn = psycopg2.connect("dbname=tournament")
     c = conn.cursor();
+    # get the id of the current tournament
+    c.execute("select id from tournaments where active = '1'")
+    currentTournament = c.fetchone()
+    
     # get the last matchid (lastMatchID) from the db. if none exists, set lastMatchID to 1. 
     # a matchid identifies who played vs who. in the case of a bye, there should only be one match id
     c.execute("select matchid from matchresults order by matchid desc limit 1")
@@ -104,11 +111,14 @@ def reportMatch(player1, result1, player2=0, result2=0):
         lastMatchID = int(lastMatchID[0]) + 1
     
     if result1 == 'b': # if result1 == b(ye), there is no player2 result2
-        c.execute("insert into matchresults (matchid, playerid, result) values ('%s', %s, %s)", (lastMatchID, player1, result1))
+        c.execute("insert into matchresults (matchid, playerid, result, tournamentid) values \
+            ('%s', %s, %s, %s)", (lastMatchID, player1, result1, currentTournament))
         conn.commit()
     else: # for all other results (w/l/d), there should be two inserts
-        c.execute("insert into matchresults (matchid, playerid, result) values ('%s', %s, %s)", (lastMatchID, player1, result1))
-        c.execute("insert into matchresults (matchid, playerid, result) values ('%s', %s, %s)", (lastMatchID, player2, result2))
+        c.execute("insert into matchresults (matchid, playerid, result, tournamentid) values \
+            ('%s', %s, %s, %s)", (lastMatchID, player1, result1, currentTournament))
+        c.execute("insert into matchresults (matchid, playerid, result, tournamentid) values \
+            ('%s', %s, %s, %s)", (lastMatchID, player2, result2, currentTournament))
         conn.commit()
 
 

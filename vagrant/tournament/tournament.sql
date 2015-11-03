@@ -51,7 +51,7 @@ group by players.id, tournaments.id;
 -- shows the opponents for each player
 -- used to look up OMW (Opponent Match Wins), the total number of wins by players they have played against.
 create view opponents AS
-select a.playerid as player, b.playerid as opponent, tournaments.id
+select a.playerid as player, b.playerid as opponent, tournaments.id as tournamentid
 from matchresults as a, matchresults as b, tournaments
 where a.matchid = b.matchid
 and a.playerid != b.playerid
@@ -63,21 +63,23 @@ order by a.playerid;
 
 
 create view omw AS
-select opponents.player, sum(wins.wins) as opponentwins, tournaments.id as tournamentid
+select opponents.player as playerid, sum(wins.wins) as opponentwins, tournaments.id as tournamentid
 from opponents, wins, tournaments
 where wins.playerid = opponents.opponent
-group by player, tournamentid;
+and tournaments.id = ( select id from tournaments where active = 1 )
+group by player, tournaments.id;
 
 -- playerstandings shows player id, player name, wins, matchesplayed, and opponent wins
 create view playerstandings AS
-select players.id, players.name, COALESCE(wins, 0) as wins, COALESCE (matchesplayed, 0) as matchesplayed, \ 
-	COALESCE (opponentwins, 0) as opponentwins
+select players.id, players.name, COALESCE(wins, 0) as wins, COALESCE (matchesplayed, 0) as matchesplayed, 
+	COALESCE (opponentwins, 0) as opponentwins, 
+	players.tournamentid
 	from players
 left join wins
 on players.id = wins.playerid
 left join matchesplayed
 on matchesplayed.playerid = players.id
 left join omw
-on matchesplayed.playerid = omw.player
+on omw.playerid = players.id
 where players.tournamentid = ( select id from tournaments where active = 1 )
 order by wins DESC, opponentwins DESC;
