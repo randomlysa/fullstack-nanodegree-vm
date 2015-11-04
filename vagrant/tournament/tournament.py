@@ -13,7 +13,7 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    conn = psycopg2.connect("dbname=tournament")
+    conn = connect()
     c = conn.cursor()    
     c.execute("delete from matchresults")
     ### c.execute("delete from match")
@@ -23,7 +23,7 @@ def deleteMatches():
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    conn = psycopg2.connect("dbname=tournament")
+    conn = connect()
     c = conn.cursor()
     c.execute("delete from  players")
     conn.commit()
@@ -31,7 +31,7 @@ def deletePlayers():
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    conn = psycopg2.connect("dbname=tournament")
+    conn = connect()
     c = conn.cursor();
     c.execute("SELECT count(*) from players")
     return c.fetchone()[0]
@@ -48,7 +48,7 @@ def registerPlayer(name, tid):
       name: the player's full name (need not be unique).
       tid = tournament id (the tournament must already be created)
     """
-    conn = psycopg2.connect("dbname=tournament")
+    conn = connect()
     c = conn.cursor();
     c.execute("INSERT INTO players (name, tournamentid) VALUES (%s, %s)", (name, tid,))
     conn.commit()
@@ -69,7 +69,7 @@ def playerStandings():
         matches: the number of matches the player has played
     """
 
-    conn = psycopg2.connect("dbname=tournament")
+    conn = connect()
     c = conn.cursor();
     c.execute("select * from playerstandings");
     return c.fetchall()
@@ -95,7 +95,7 @@ def reportMatch(player1, result1, player2=0, result2=0):
         tournamentid: which tournament is this match played in. this is determined automatically by finding the id of 
             the active tournament
     """
-    conn = psycopg2.connect("dbname=tournament")
+    conn = connect()
     c = conn.cursor();
     # get the id of the current tournament
     c.execute("select id from tournaments where active = '1'")
@@ -141,8 +141,13 @@ def swissPairings():
         name2: the second player's name
     """
     
-    conn = psycopg2.connect("dbname=tournament")
+    conn = connect()
     c = conn.cursor();
+
+    # determine how many matches have been played. 
+    # this is needed for the pairing system later...
+    c.execute("select matchesplayed from playerstandings");
+    matchesplayed = c.fetchone()[0]
     
     # this is the select that is used for an even number of players
     c.execute("select id, name, wins from playerstandings");
@@ -154,7 +159,6 @@ def swissPairings():
         #    set this playerid to be 'currentBye'
         # select the remaining players to be paired    
         
-    
     if playerCount % 2 != 0:
         ##print "odd number of players"
         # get list of players who have not had a bye
@@ -218,28 +222,107 @@ def swissPairings():
         
         
     
-    # get all players (for even or odd number of players)
+    
+    
+    # get players (for even - all players; for odd - all players except player with bye)
     rows = c.fetchall()
-    # debugging
-    # thisResult = c.rowcount
     
-    ids = list()
-    names = list()
-    # get names and ids of all players and put (append) them into a list to work with later    
-    for row in rows:
-        ids.append(row[0])
-        names.append(row[1])
+    ## print rows
+    print matchesplayed
     
+    '''
+    if (matchesplayed == 0):
+        # use this pairing system if matchesplayed = 0
+        
+        ids = list()
+        names = list()
+        # get names and ids of all players and put (append) them into a list to work with later    
+        for row in rows:
+            ids.append(row[0])
+            names.append(row[1])    
+        
+        n = 0 # to keep track of names
+        i = 0 # to keep track of sets of names
+        set = list() # contains a list of pairings
+        pairing = list() # contains pairings for a round (id, name, id2, name2)    
+        
+        while n < len(ids):        
+            pairing = (ids[n], names[n], ids[n+1], names[n+1])
+            set.append(pairing)
+            n = n + 2
+            i = i + 1    
+
+    '''
+    if (matchesplayed < 100):
+        # use this pairing system if matchesplayed > 0
+        
+        # get a list of all  playerids who are playing in this round.
+        playerids = list()
+        names = list()
+        for row in rows:
+            playerids.append(row[0])
+            names.append(row[1])
+        
+        set = list() # contains a list of pairings
+        pairing = list() # contains pairings for a round (id, name, id2, name2)   
+            
+        while (playerids):
+        
+            print "Remaining players " + str(playerids);
+        
+            # pick the first player from the list, find an opponent for him, 
+            # then remove him and the opponent from the list.
+            # repeat until playerids is empty
+            
+            # part one of the query matches players with equal wins.
+            # part two of the query (EXECEPT) returns a list of players already 
+            # matched and removes them from the first query.
+            
+            c.execute(" \
+            with temp_pairings as ( select \
+            a.id as player, b.id as opponent \
+            from playerstandings as a, playerstandings as b \
+            where a.id != b.id \
+            and a.wins in (b.wins, b.wins + 1) \
+            EXCEPT \
+            select \
+            player, opponent \
+            from opponents \
+            order by player \
+            ) \
+            select player, opponent \
+            from temp_pairings \
+            where player = '%s' \
+            and opponent in %s \
+            order by player;", (playerids[0], tuple(playerids),))
+            
+            # resultsX = c.rowcount
+            # print resultsX
+            # print "length" + str(len(playerids))
+            
+            opponent = c.fetchone()[1]
+            print "player " + str(playerids[0])
+            print "opponent " + str(opponent)
+            
+            # get the names to go with the playerids: (id, name, id, name)
+            c.execute(" select a.id, a.name, b.id, b.name \
+                from players as a, players as b \
+                where a.id = '%s' \
+                and b.id = '%s';", (playerids[0], opponent,))
+            pairing = c.fetchone()
+            # add the pairing to set
+            set.append(pairing)
+            
+            print "list before:"
+            print playerids
+            ## remove id[0] and opponent from the list 'playerids'
+            playerids.remove ( playerids[0] )
+            playerids.remove ( opponent ) 
+            print "list after:"
+            print playerids
+            if len(playerids) == 0:
+                break
     
-    n = 0 # to keep track of names
-    i = 0 # to keep track of sets of names
-    set = list() # contains a list of pairings
-    pairing = list() # contains pairings for a round (id, name, id2, name2)
-    while n < len(ids):
-        pairing = (ids[n], names[n], ids[n+1], names[n+1])
-        set.append(pairing)
-        n = n + 2
-        i = i + 1    
     return set
     
         
