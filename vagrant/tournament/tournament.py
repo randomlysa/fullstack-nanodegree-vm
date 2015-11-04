@@ -177,6 +177,8 @@ def swissPairings():
         left join matchresults \
         on players.id = matchresults.playerid \
         where \
+        	players.tournamentid = (select id from tournaments where active = 1) \
+            and \
             players.id not in ( \
             select playerid from matchresults where result = 'b' \
             );")
@@ -203,8 +205,8 @@ def swissPairings():
         # report currentBye as a bye
         reportMatch(currentBye, 'b')
 
-        # debug  print "Skipping"
-        # debug  print currentBye
+        print "Player with bye: "
+        print currentBye
 
         # get all players (for odd number of players,
         # skips player who was assigned a bye for this round)
@@ -228,8 +230,7 @@ def swissPairings():
     # get players (for even - all players
     # for odd - all players except player with bye)
     rows = c.fetchall()
-
-    # debug print rows
+    print len(rows)
     # debug print matchesplayed
 
     '''
@@ -284,8 +285,10 @@ def swissPairings():
             # part three (and opponent in %s) makes sure the rows returned
                 # only those opponents who are left in the list playerids
 
+            
             c.execute(" \
-            with temp_pairings as ( select \
+            with temp_pairings as ( \
+            select \
             a.id as player, b.id as opponent \
             from playerstandings as a, playerstandings as b \
             where a.id != b.id \
@@ -302,22 +305,25 @@ def swissPairings():
             and opponent in %s \
             order by player;", (playerids[0], tuple(playerids),))
 
-            # resultsX = c.rowcount
+            results = c.rowcount
+            
+            # if results == 0:
+            
             # print resultsX
             # print "length" + str(len(playerids))
 
             pair = c.fetchone()
             # debug print pair
             # print "player " + str(playerids[0])
-            # print "opponent " + str(opponent)
-            # debug print playerids
+            # print "opponent " + str(opponent)            
 
             # get the names to go with the playerids: (id, name, id, name)
-            c.execute(" select a.id, a.name, b.id, b.name \
+            c.execute("select a.id, a.name, b.id, b.name \
                 from players as a, players as b \
                 where a.id = '%s' \
                 and b.id = '%s';", (playerids[0], playerids[1],))
             pairing = c.fetchone()
+            print pairing
             # add the pairing to set
             set.append(pairing)
 
