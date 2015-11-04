@@ -14,11 +14,9 @@ def connect():
 def deleteMatches():
     """Remove all the match records from the database."""
     conn = connect()
-    c = conn.cursor()    
+    c = conn.cursor()
     c.execute("delete from matchresults")
-    ### c.execute("delete from match")
     conn.commit()
-
 
 
 def deletePlayers():
@@ -32,10 +30,9 @@ def deletePlayers():
 def countPlayers():
     """Returns the number of players currently registered."""
     conn = connect()
-    c = conn.cursor();
+    c = conn.cursor()
     c.execute("SELECT count(*) from players")
     return c.fetchone()[0]
-
 
 
 def registerPlayer(name, tid):
@@ -49,17 +46,17 @@ def registerPlayer(name, tid):
       tid = tournament id (the tournament must already be created)
     """
     conn = connect()
-    c = conn.cursor();
-    c.execute("INSERT INTO players (name, tournamentid) VALUES (%s, %s)", (name, tid,))
+    c = conn.cursor()
+    c.execute("INSERT INTO players (name, tournamentid) \
+            VALUES (%s, %s)", (name, tid,))
     conn.commit()
-
 
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
 
-    The first entry in the list should be the player in first place, or a player
-    tied for first place if there is currently a tie.
+    The first entry in the list should be the player in first place,
+    or a player tied for first place if there is currently a tie.
 
     Returns:
       A list of tuples, each of which contains (id, name, wins, matches):
@@ -70,55 +67,67 @@ def playerStandings():
     """
 
     conn = connect()
-    c = conn.cursor();
-    c.execute("select * from playerstandings");
+    c = conn.cursor()
+    c.execute("select * from playerstandings")
     return c.fetchall()
 
 
 def reportMatch(player1, result1, player2=0, result2=0):
-    """Records the outcome of a single match between two players to table 'matchresults'
+    """Records the outcome of a single match
+    between two players to table 'matchresults'
 
     Args:
       player1:  the id number of player 1
       result1:  can be w(in) / l(oss) / d(raw) / b(ye)
-      
+
       player2:  the id number of player 2
-      result2:  can be w(in) / l(oss) / d(raw) 
-      
-      player2 and result2 are set to 0 by default so a 'bye' week reportMatch doesn't need 4 arguments, only two.
-      
+      result2:  can be w(in) / l(oss) / d(raw)
+
+      player2 and result2 are set to 0 by default so a 'bye' week
+      reportMatch doesn't need four arguments, only two.
+
       matchresults table:
         id: unique id (serial)
-        match id: normal matches have two rows that have the same match id. bye weeks have one row.
+        match id: normal matches have two rows that have the same match id.
+                  bye weeks have one row.
         playerid: id of the player
         result: w/l/d/b
-        tournamentid: which tournament is this match played in. this is determined automatically by finding the id of 
-            the active tournament
+        tournamentid: which tournament is this match played in.
+                      this is determined automatically by finding the id of
+                      the active tournament.
     """
     conn = connect()
-    c = conn.cursor();
+    c = conn.cursor()
     # get the id of the current tournament
     c.execute("select id from tournaments where active = '1'")
     currentTournament = c.fetchone()
-    
-    # get the last matchid (lastMatchID) from the db. if none exists, set lastMatchID to 1. 
-    # a matchid identifies who played vs who. in the case of a bye, there should only be one match id
+
+    # get the last matchid (lastMatchID) from the db.
+    # if none exists, set lastMatchID to 1.
+    # a matchid identifies who played vs who.
+    # in the case of a bye, there should only be one match id
     c.execute("select matchid from matchresults order by matchid desc limit 1")
     lastMatchID = c.fetchone()
     if lastMatchID == None:
         lastMatchID = 1
     else:
         lastMatchID = int(lastMatchID[0]) + 1
-    
-    if result1 == 'b': # if result1 == b(ye), there is no player2 result2
-        c.execute("insert into matchresults (matchid, playerid, result, tournamentid) values \
-            ('%s', %s, %s, %s)", (lastMatchID, player1, result1, currentTournament))
+
+    if result1 == 'b':  # if result1 == b(ye), there is no player2 result2
+        c.execute("insert into matchresults \
+                 (matchid, playerid, result, tournamentid) values \
+                 ('%s', %s, %s, %s)",
+                 (lastMatchID, player1, result1, currentTournament))
         conn.commit()
-    else: # for all other results (w/l/d), there should be two inserts
-        c.execute("insert into matchresults (matchid, playerid, result, tournamentid) values \
-            ('%s', %s, %s, %s)", (lastMatchID, player1, result1, currentTournament))
-        c.execute("insert into matchresults (matchid, playerid, result, tournamentid) values \
-            ('%s', %s, %s, %s)", (lastMatchID, player2, result2, currentTournament))
+    else:  # for all other results (w/l/d), there should be two inserts
+        c.execute("insert into matchresults \
+                 (matchid, playerid, result, tournamentid) values \
+                 ('%s', %s, %s, %s)", \
+                 (lastMatchID, player1, result1, currentTournament))
+        c.execute("insert into matchresults \
+                 (matchid, playerid, result, tournamentid) values \
+                 ('%s', %s, %s, %s)", \
+                 (lastMatchID, player2, result2, currentTournament))
         conn.commit()
 
 
@@ -126,11 +135,11 @@ def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
 
     If there are an even number of players registered, each player
-    appears exactly once in the pairings.  Each player is paired with another
-    player with an equal or nearly-equal win record, that is, a player adjacent
-    to him or her in the standings.
-    
-    If an odd number of players are registered, one is picked at random to 
+    appears exactly once in the pairings.  Each player is paired with
+    another player with an equal or nearly-equal win record, that is,
+    a player adjacent to him or her in the standings.
+
+    If an odd number of players are registered, one is picked at random to
         receive a bye week.
 
     Returns:
@@ -140,27 +149,27 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-    
-    conn = connect()
-    c = conn.cursor();
 
-    # determine how many matches have been played. 
-    # this is needed for the pairing system later...
-    c.execute("select matchesplayed from playerstandings");
+    conn = connect()
+    c = conn.cursor()
+
+    # determine how many matches have been played.
+    # this is needed for the pairing system later.
+    c.execute("select matchesplayed from playerstandings")
     matchesplayed = c.fetchone()[0]
-    
+
     # this is the select that is used for an even number of players
-    c.execute("select id, name, wins from playerstandings");
+    c.execute("select id, name, wins from playerstandings")
     playerCount = c.rowcount
-    
-    # if playerCount is an odd number, 
-        # get list of players who have not had a bye
-        # assign a bye to one of those players. 
-        #    set this playerid to be 'currentBye'
-        # select the remaining players to be paired    
-        
+
+    # if playerCount is an odd number,
+    # get list of players who have not had a bye
+    # assign a bye to one of those players.
+    # set this playerid to be 'currentBye'
+    # select the remaining players to be paired
+
     if playerCount % 2 != 0:
-        ##print "odd number of players"
+        # debug print "odd number of players"
         # get list of players who have not had a bye
         c.execute(" \
         select players.id \
@@ -171,35 +180,34 @@ def swissPairings():
             players.id not in ( \
             select playerid from matchresults where result = 'b' \
             );")
-        
+
         playersWithoutByeCount = c.rowcount
 
         rows = c.fetchall()
-        
-        ## Debugging
-        ## print "list of players without a bye"
-        ## print rows;
-        
-        ## print "number of players without a bye"
-        ## print playersWithoutByeCount
-        
+
+        # debug  print "list of players without a bye"
+        # debug  print rows
+
+        # debug  print "number of players without a bye"
+        # debug  print playersWithoutByeCount
+
         # assign a bye to one of those players.
         from random import randint
         pickPlayerForBye = randint(0, playersWithoutByeCount - 1)
-        
-        
-        ## print "Player picked for bye is..."
-        ## print pickPlayerForBye
-        
+
+        # debug  print "Player picked for bye is..."
+        # debug  print pickPlayerForBye
+
         # set this playerid to be currentBye
         currentBye = rows[pickPlayerForBye]
         # report currentBye as a bye
         reportMatch(currentBye, 'b')
-        
-        ## print "Skipping"
-        ## print currentBye        
-        
-        # get all players (for odd number of players, skips player who was assigned a bye for this round)
+
+        # debug  print "Skipping"
+        # debug  print currentBye
+
+        # get all players (for odd number of players,
+        # skips player who was assigned a bye for this round)
         # this is the select that is used for an odd number of players
         # not sure why this query is like this - can i make it simpler?
         '''
@@ -210,74 +218,72 @@ def swissPairings():
                 left join matchresults \
                 on players.id = matchresults.playerid \
                 where players.id !=  '%s' \
-                ", currentBye)            
-            
+                ", currentBye)
             rows = c.fetchall()
         '''
 
-        c.execute ("select id, name \
-            from playerstandings \
-            where id !=  '%s' \
-            ", currentBye)
-        
-        
-    
-    
-    
-    # get players (for even - all players; for odd - all players except player with bye)
+        c.execute("select id, name from playerstandings where id !=  '%s' ", \
+                currentBye)
+
+    # get players (for even - all players
+    # for odd - all players except player with bye)
     rows = c.fetchall()
-    
-    ## print rows
-    print matchesplayed
-    
+
+    # debug print rows
+    # debug print matchesplayed
+
     '''
     if (matchesplayed == 0):
         # use this pairing system if matchesplayed = 0
-        
+
         ids = list()
         names = list()
-        # get names and ids of all players and put (append) them into a list to work with later    
+        # get names and ids of all players and put (append)
+            # them into a list to work with later
         for row in rows:
             ids.append(row[0])
-            names.append(row[1])    
-        
+            names.append(row[1])
+
         n = 0 # to keep track of names
         i = 0 # to keep track of sets of names
         set = list() # contains a list of pairings
-        pairing = list() # contains pairings for a round (id, name, id2, name2)    
-        
-        while n < len(ids):        
+        pairing = list() # contains pairings for a round
+                         # (id, name, id2, name2)
+
+        while n < len(ids):
             pairing = (ids[n], names[n], ids[n+1], names[n+1])
             set.append(pairing)
             n = n + 2
-            i = i + 1    
+            i = i + 1
 
     '''
     if (matchesplayed < 100):
         # use this pairing system if matchesplayed > 0
-        
+
         # get a list of all  playerids who are playing in this round.
         playerids = list()
         names = list()
         for row in rows:
             playerids.append(row[0])
             names.append(row[1])
-        
-        set = list() # contains a list of pairings
-        pairing = list() # contains pairings for a round (id, name, id2, name2)   
-            
+
+        set = list()  # contains a list of pairings
+        pairing = list()  # contains pairings for a round (id,name, id2,name2)
+
         while (playerids):
-        
-            print "Remaining players " + str(playerids);
-        
-            # pick the first player from the list, find an opponent for him, 
+
+            # debug print "Remaining players " + str(playerids)
+
+            # pick the first player from the list, find an opponent for him,
             # then remove him and the opponent from the list.
             # repeat until playerids is empty
-            
+
             # part one of the query matches players with equal wins.
-            # part two of the query (EXECEPT) returns a list of players already 
-            # matched and removes them from the first query.
-            
+            # part two of the query (EXECEPT) returns a list of players
+                # already matched and removes them from the first query.
+            # part three (and opponent in %s) makes sure the rows returned
+                # only those opponents who are left in the list playerids
+
             c.execute(" \
             with temp_pairings as ( select \
             a.id as player, b.id as opponent \
@@ -295,35 +301,36 @@ def swissPairings():
             where player = '%s' \
             and opponent in %s \
             order by player;", (playerids[0], tuple(playerids),))
-            
+
             # resultsX = c.rowcount
             # print resultsX
             # print "length" + str(len(playerids))
-            
-            opponent = c.fetchone()[1]
-            print "player " + str(playerids[0])
-            print "opponent " + str(opponent)
-            
+
+            pair = c.fetchone()
+            # debug print pair
+            # print "player " + str(playerids[0])
+            # print "opponent " + str(opponent)
+            # debug print playerids
+
             # get the names to go with the playerids: (id, name, id, name)
             c.execute(" select a.id, a.name, b.id, b.name \
                 from players as a, players as b \
                 where a.id = '%s' \
-                and b.id = '%s';", (playerids[0], opponent,))
+                and b.id = '%s';", (playerids[0], playerids[1],))
             pairing = c.fetchone()
             # add the pairing to set
             set.append(pairing)
-            
-            print "list before:"
-            print playerids
-            ## remove id[0] and opponent from the list 'playerids'
-            playerids.remove ( playerids[0] )
-            playerids.remove ( opponent ) 
-            print "list after:"
-            print playerids
+
+            # debug print "list before:"
+            # debug print playerids
+            # remove id[0] and opponent from the list 'playerids'
+            player = playerids[0]
+            opponent = playerids[1]
+            playerids.remove(player)
+            playerids.remove(opponent)
+
+            # debug print "list after:"
+            # debug print playerids
             if len(playerids) == 0:
                 break
-    
     return set
-    
-        
-    
