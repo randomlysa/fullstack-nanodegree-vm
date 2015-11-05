@@ -8,3 +8,6 @@ vagrant/.vagrant/machines/default/virtualbox/private_key
 *.pyc
 vagrant/Vagrantfile
 vagrant/Vagrantfile
+vagrant/tournament/misc.py
+vagrant/tournament/test2.py
+vagrant/tournament/test1.py

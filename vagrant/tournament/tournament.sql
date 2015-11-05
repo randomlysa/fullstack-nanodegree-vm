@@ -8,7 +8,6 @@
 
 -- create database tournament;
 
-
 create table tournaments (
 id serial primary key,
 name text,
@@ -50,6 +49,7 @@ group by players.id;
 
 -- shows the opponents for each player
 -- used to look up OMW (Opponent Match Wins), the total number of wins by players they have played against.
+-- also used to prevent rematches by looking up previous opponents
 create view opponents AS
 select a.playerid as player, b.playerid as opponent 
 from matchresults as a, matchresults as b
@@ -58,10 +58,6 @@ and a.playerid != b.playerid
 and a.tournamentid = (select id from tournaments where active = 1)
 and b.tournamentid = (select id from tournaments where active = 1)
 order by a.playerid;
-
--- for debugging, ignore
--- #select a.playerid, a.result, b.playerid, b.result, a.matchid, b.matchid
-
 
 create view omw AS
 select opponents.player as playerid, sum(wins.wins) as opponentwins

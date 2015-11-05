@@ -205,8 +205,8 @@ def swissPairings():
         # report currentBye as a bye
         reportMatch(currentBye, 'b')
 
-        print "Player with bye: "
-        print currentBye
+        # debug print "Player with bye: "
+        # debug print currentBye
 
         # get all players (for odd number of players,
         # skips player who was assigned a bye for this round)
@@ -230,7 +230,7 @@ def swissPairings():
     # get players (for even - all players
     # for odd - all players except player with bye)
     rows = c.fetchall()
-    print len(rows)
+    # debug print len(rows)
     # debug print matchesplayed
 
     '''
@@ -281,10 +281,13 @@ def swissPairings():
 
             # part one of the query matches players with equal wins.
             # part two of the query (EXECEPT) returns a list of players
-                # already matched and removes them from the first query.
+            # already matched and removes them from the first query.
             # part three (and opponent in %s) makes sure the rows returned
-                # only those opponents who are left in the list playerids
-
+            # only those opponents who are left in the list playerids
+            
+            # b.wins + 1 needs to be changed to only run when results for 
+            # this query are 1 (I think this only happens with odd numbers
+            # of players)
             
             c.execute(" \
             with temp_pairings as ( \
@@ -323,7 +326,7 @@ def swissPairings():
                 where a.id = '%s' \
                 and b.id = '%s';", (playerids[0], playerids[1],))
             pairing = c.fetchone()
-            print pairing
+            # debug print pairing
             # add the pairing to set
             set.append(pairing)
 
