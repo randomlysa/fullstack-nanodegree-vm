@@ -4,7 +4,7 @@ Player standings are sorted by wins and opponent match wins.
 
 # Set up the database
 
-Create a database:
+Create a database with the name tournament:
 ```
 	psql
 	create database tournament;
@@ -23,7 +23,10 @@ INSERT INTO tournaments (name, startdate, active) VALUES ('tournament name', '20
 ```
 
 # Use python functions to run the tournament
-
+Import tournament
+```
+from tournament import *
+```
 Register players using player name, tournamentid
 ```
 registerPlayer("Melpomene Murray", '1')
