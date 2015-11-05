@@ -67,6 +67,19 @@ group by player;
 
 -- playerstandings shows player id, player name, wins, matchesplayed, and opponent wins
 create view playerstandings AS
+select players.id, players.name, COALESCE(wins, 0) as wins, COALESCE (matchesplayed, 0) as matchesplayed
+from players
+left join wins
+on players.id = wins.playerid
+left join matchesplayed
+on matchesplayed.playerid = players.id
+left join omw
+on omw.playerid = players.id
+where players.tournamentid = ( select id from tournaments where active = 1 )
+order by wins DESC, opponentwins DESC;
+
+-- playerstandings2 shows player id, player name, wins, matchesplayed, and opponent wins
+create view playerstandings2 AS
 select players.id, players.name, COALESCE(wins, 0) as wins, COALESCE (matchesplayed, 0) as matchesplayed, 
 	COALESCE (opponentwins, 0) as opponentwins, 
 	players.tournamentid

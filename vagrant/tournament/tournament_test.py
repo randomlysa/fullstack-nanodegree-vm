@@ -30,7 +30,7 @@ def testCount():
 def testRegister():
     deleteMatches()
     deletePlayers()
-    registerPlayer("Chandra Nalaar")
+    registerPlayer("Chandra Nalaar", '1')
     c = countPlayers()
     if c != 1:
         raise ValueError(
@@ -41,10 +41,10 @@ def testRegister():
 def testRegisterCountDelete():
     deleteMatches()
     deletePlayers()
-    registerPlayer("Markov Chaney")
-    registerPlayer("Joe Malik")
-    registerPlayer("Mao Tsu-hsi")
-    registerPlayer("Atlanta Hope")
+    registerPlayer("Markov Chaney", '1')
+    registerPlayer("Joe Malik", '1')
+    registerPlayer("Mao Tsu-hsi", '1')
+    registerPlayer("Atlanta Hope", '1')
     c = countPlayers()
     if c != 4:
         raise ValueError(
@@ -59,8 +59,8 @@ def testRegisterCountDelete():
 def testStandingsBeforeMatches():
     deleteMatches()
     deletePlayers()
-    registerPlayer("Melpomene Murray")
-    registerPlayer("Randy Schwartz")
+    registerPlayer("Melpomene Murray", '1')
+    registerPlayer("Randy Schwartz", '1')
     standings = playerStandings()
     if len(standings) < 2:
         raise ValueError("Players should appear in playerStandings even before "
@@ -82,10 +82,10 @@ def testStandingsBeforeMatches():
 def testReportMatches():
     deleteMatches()
     deletePlayers()
-    registerPlayer("Bruno Walton")
-    registerPlayer("Boots O'Neal")
-    registerPlayer("Cathy Burton")
-    registerPlayer("Diane Grant")
+    registerPlayer("Bruno Walton", '1')
+    registerPlayer("Boots O'Neal", '1')
+    registerPlayer("Cathy Burton", '1')
+    registerPlayer("Diane Grant", '1')
     standings = playerStandings()
     [id1, id2, id3, id4] = [row[0] for row in standings]
     reportMatch(id1, 'w', id2, 'l')
@@ -104,10 +104,10 @@ def testReportMatches():
 def testPairings():
     deleteMatches()
     deletePlayers()
-    registerPlayer("Twilight Sparkle")
-    registerPlayer("Fluttershy")
-    registerPlayer("Applejack")
-    registerPlayer("Pinkie Pie")
+    registerPlayer("Twilight Sparkle", '1')
+    registerPlayer("Fluttershy", '1')
+    registerPlayer("Applejack", '1')
+    registerPlayer("Pinkie Pie", '1')
     standings = playerStandings()
     [id1, id2, id3, id4] = [row[0] for row in standings]
     reportMatch(id1, 'w', id2, 'l')
