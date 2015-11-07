@@ -50,12 +50,13 @@ def deletePlayers():
     """Remove all the player records from the database."""
     conn = connect()
     c = conn.cursor()
-    c.execute("delete from  players")
+    c.execute("delete from allplayers")
     conn.commit()
 
 
 def countPlayers():
-    """Returns the number of players currently registered."""
+    """Returns the number of players currently registered 
+    to the active tournament"""
     conn = connect()
     c = conn.cursor()
     c.execute("SELECT count(*) from players")
@@ -74,13 +75,14 @@ def registerPlayer(name, tid):
     """
     conn = connect()
     c = conn.cursor()
-    c.execute("INSERT INTO players (name, tournamentid) \
+    c.execute("INSERT INTO allplayers (name, tournamentid) \
             VALUES (%s, %s)", (name, tid,))
     conn.commit()
 
 
 def playerStandings():
-    """Returns a list of the players and their win records, sorted by wins.
+    """Returns a list of the players and their win records, sorted by wins, 
+    for the active tournament.
 
     The first entry in the list should be the player in first place,
     or a player tied for first place if there is currently a tie.
