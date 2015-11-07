@@ -14,8 +14,8 @@ def connect():
 def createTournament(name, startdate):
     """Adds a tournament to the database. The tournament will not be set as active.
     Use setTournamentAsActive(name) for this.
-    
-    Args: 
+
+    Args:
     name - the name for the tournament
     startdate - the date the tournament starts
     """
@@ -28,12 +28,13 @@ def createTournament(name, startdate):
 
 
 def setTournamentAsActive(id):
-    """Set a tournament to be active AND sets all other tournaments to be not active. """
+    """Set a tournament to be active AND
+    sets all other tournaments to be not active. """
+
     conn = connect()
     c = conn.cursor()
-    print 'hello'
-    c.execute("UPDATE tournaments SET active = 0");
-    c.execute("UPDATE tournaments SET active = 1 where id = %s", (id,));
+    c.execute("UPDATE tournaments SET active = 0")
+    c.execute("UPDATE tournaments SET active = 1 where id = %s", (id,))
     conn.commit()
 
 
@@ -94,13 +95,27 @@ def playerStandings():
 
     conn = connect()
     c = conn.cursor()
+    # count how many tournaments are set as active. there should only be one
     c.execute("select * from tournaments where active = 1")
     activetournaments = c.rowcount
+    # count how many players are are registered to the active tournament
+    c.execute(
+        "select * from players where tournamentid = \
+        (select id from tournaments where active = 1)"
+    )
+    playersregisteredtoactivetournament = c.rowcount
     if activetournaments != 1:
-        print "\
-            Error. The number of tournaments set to 'active' is not exactly\
+        raise ValueError(
+            " The number of tournaments set to 'active' is not exactly\
             one. Please use setTournamentAsActive(id) to set one tournament\
             to be active."
+        )
+    if playersregisteredtoactivetournament == 0:
+        raise ValueError(
+            "There are no players registered to the active tournament.\
+            Register some players or switch to a tournament that has players\
+            registered."
+        )
     else:
         c.execute("select * from playerstandings")
     return c.fetchall()
