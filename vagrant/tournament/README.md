@@ -17,16 +17,19 @@ Connect to the database and import tournament.sql
 	\i tournament.sql
 ```
 
-Create a tournament and mark it as active 
-```
-INSERT INTO tournaments (name, startdate, active) VALUES ('tournament name', '2015-02-11', '1');
-```
 
 # Use python functions to run the tournament
 Import tournament
 ```
 from tournament import *
 ```
+
+Create a tournament and mark it as active 
+```
+createTournament(name, startdate)
+setTournamentAsActive(id)
+```
+
 Register players using player name, tournamentid
 ```
 registerPlayer("Melpomene Murray", '1')

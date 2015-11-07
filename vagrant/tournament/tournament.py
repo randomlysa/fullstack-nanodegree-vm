@@ -12,8 +12,8 @@ def connect():
 
 
 def createTournament(name, startdate):
-    """Adds a tournament to the database. The tournament will not be set as active.
-    Use setTournamentAsActive(name) for this.
+    """Adds a tournament to the database. The tournament will NOT be set as active.
+    Use setTournamentAsActive(id) to set a tournament as active.
 
     Args:
     name - the name for the tournament
