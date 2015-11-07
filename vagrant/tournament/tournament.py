@@ -55,7 +55,7 @@ def deletePlayers():
 
 
 def countPlayers():
-    """Returns the number of players currently registered 
+    """Returns the number of players currently registered
     to the active tournament"""
     conn = connect()
     c = conn.cursor()
@@ -81,7 +81,7 @@ def registerPlayer(name, tid):
 
 
 def playerStandings():
-    """Returns a list of the players and their win records, sorted by wins, 
+    """Returns a list of the players and their win records, sorted by wins,
     for the active tournament.
 
     The first entry in the list should be the player in first place,
