@@ -15,7 +15,9 @@ startdate date,
 active smallint
 );
 
-create table players (
+-- previously named 'players.' I will create a view named players that
+-- shows only players registered to the active tournament. 
+create table allplayers (
 id serial primary key,
 name text,
 tournamentid int references tournaments (id)
@@ -25,10 +27,15 @@ tournamentid int references tournaments (id)
 create table matchresults (
 id serial primary key,
 matchid smallint,
-playerid int references players (id),
+playerid int references allplayers (id),
 result text,
 tournamentid int references tournaments (id)
 );
+
+-- shows only players registered for the active tournament
+create view players AS
+select * from allplayers 
+where tournamentid = (select id from tournaments where active = 1);
 
 -- counts the number of wins each player has for view 'playerstandings.' a bye counts as a win.
 create view wins AS
