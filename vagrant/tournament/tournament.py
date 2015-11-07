@@ -11,6 +11,32 @@ def connect():
     return psycopg2.connect("dbname=tournament")
 
 
+def createTournament(name, startdate):
+    """Adds a tournament to the database. The tournament will not be set as active.
+    Use setTournamentAsActive(name) for this.
+    
+    Args: 
+    name - the name for the tournament
+    startdate - the date the tournament starts
+    """
+    conn = connect()
+    c = conn.cursor()
+    c.execute("\
+        INSERT INTO tournaments (name, startdate) \
+        VALUES (%s, %s)", (name, startdate,))
+    conn.commit()
+
+
+def setTournamentAsActive(id):
+    """Set a tournament to be active AND sets all other tournaments to be not active. """
+    conn = connect()
+    c = conn.cursor()
+    print 'hello'
+    c.execute("UPDATE tournaments SET active = 0");
+    c.execute("UPDATE tournaments SET active = 1 where id = %s", (id,));
+    conn.commit()
+
+
 def deleteMatches():
     """Remove all the match records from the database."""
     conn = connect()
@@ -68,7 +94,15 @@ def playerStandings():
 
     conn = connect()
     c = conn.cursor()
-    c.execute("select * from playerstandings")
+    c.execute("select * from tournaments where active = 1")
+    activetournaments = c.rowcount
+    if activetournaments != 1:
+        print "\
+            Error. The number of tournaments set to 'active' is not exactly\
+            one. Please use setTournamentAsActive(id) to set one tournament\
+            to be active."
+    else:
+        c.execute("select * from playerstandings")
     return c.fetchall()
 
 
@@ -293,23 +327,25 @@ def swissPairings():
         # only those opponents who are left in the list playerids
 
         c.execute(
-            "with temp_pairings as ( \
-            select \
-            a.id as player, b.id as opponent \
-            from playerstandings as a, playerstandings as b \
-            where a.id != b.id \
-            and a.wins = b.wins \
-            EXCEPT \
-            select \
-            player, opponent \
-            from opponents \
-            order by player \
-            ) \
-            select player, opponent \
-            from temp_pairings \
-            where player = '%s' \
-            and opponent in %s \
-            order by player;", (playerids[0], tuple(playerids),)
+            '''
+            with temp_pairings as (
+            select
+            a.id as player, b.id as opponent
+            from playerstandings as a, playerstandings as b
+            where a.id != b.id
+            and a.wins = b.wins
+            EXCEPT
+            select
+            player, opponent
+            from opponents
+            order by player
+            )
+            select player, opponent
+            from temp_pairings
+            where player = '%s'
+            and opponent in %s
+            order by player;
+            ''', (playerids[0], tuple(playerids),)
         )
 
         # results = c.rowcount
