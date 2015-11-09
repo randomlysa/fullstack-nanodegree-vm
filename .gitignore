@@ -11,3 +11,4 @@ vagrant/Vagrantfile
 vagrant/tournament/misc.py
 vagrant/tournament/test2.py
 vagrant/tournament/test1.py
+vagrant/tournament/misc.py
