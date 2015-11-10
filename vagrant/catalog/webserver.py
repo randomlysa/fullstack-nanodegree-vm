@@ -9,9 +9,10 @@ DBSession = sessionmaker(bind = engine)
 session = DBSession()
 
 
-class WebServerHandler(BaseHTTPRequestHandler):
+class webServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
+
         newPath = self.path.partition('?')
         if self.path.endswith("/restaurants"):
             self.send_response(200)
@@ -23,10 +24,10 @@ class WebServerHandler(BaseHTTPRequestHandler):
             restaurants =  session.query(Restaurant).all()
             for restaurant in restaurants:
                 message += "<h2>%s</h2>\n" % restaurant.name
-                message += "<a href=''>Edit</a> | <a href='/restaurant/delete?r=%s'>Delete</a>\n" % restaurant.id
+                message += "<a href=''>Edit</a> | <a href='/restaurants/delete?r=%s'>Delete</a>\n" % restaurant.id
                 # message += restaurant.name[0:-2]
             message += "<hr><a href='/restaurants/new'>Create a new restaurant</a>"
-            message += "</body></html>"
+            message += "</body></html>\n\n"
             self.wfile.write(message)
             print message
             return
@@ -40,6 +41,7 @@ class WebServerHandler(BaseHTTPRequestHandler):
             output += " <h1>Add a new restaurant</h1>\n"
             output += " <form method='POST' enctype='multipart/form-data' action='/restaurants/new'> \n\
                         <h2> Name of restarant to add: </h2> \n\
+                        <input name='action' type='hidden' value='create'> \n\
                         <input name='message' type='text'><input type='submit' value='submit'> \n\
                         </form>\n"
             output += " </body></html>\n"
@@ -47,7 +49,7 @@ class WebServerHandler(BaseHTTPRequestHandler):
             print output
             return
 
-        if newPath[0] == ("/restaurant/delete") or self.path == ("/restaurant/delete"):
+        if newPath[0] == ("/restaurants/delete") or self.path == ("/restaurants/delete"):
             deleteWhich = newPath[2].partition('=') # get the part after the ?, ie, the restarant id
             deleteId = deleteWhich[2]
             self.send_response(200)
@@ -61,8 +63,9 @@ class WebServerHandler(BaseHTTPRequestHandler):
             output = ""
             output += " <html><body>\n"
             output += " <h1>Delete %s</h1>\n" % thisName.name
-            output += " <form method='POST' enctype='multipart/form-data' action='/restaurant/delete'> \n\
-                        <input name='message' type='hidden' value='delete%s'><input type='submit' value='Delete it!'> \n\
+            output += " <form method='POST' enctype='multipart/form-data' action='/restaurants/delete'> \n\
+                        <input name='action' type='hidden' value='delete'> \n\
+                        <input name='message' type='hidden' value='%s'><input type='submit' value='Delete it!'> \n\
                         </form>\n" % deleteId
             output += " </body></html>\n"
             self.wfile.write(output)
@@ -81,11 +84,14 @@ class WebServerHandler(BaseHTTPRequestHandler):
             if ctype == 'multipart/form-data':
                 fields=cgi.parse_multipart(self.rfile, pdict)
                 messagecontent = fields.get('message')
+                action = fields.get('action')[0]
 
-            print "SELF.PATH = "
-            print self.path
+            print "action " 
+            print action
+            print "messagecontent[0] "
+            print messagecontent[0]
 
-            if self.path.endwith("/restaurants/new"):
+            if action == 'create':
                 addRestaurant = Restaurant(name = messagecontent[0])
                 session.add(addRestaurant)
                 session.commit()
@@ -108,12 +114,16 @@ class WebServerHandler(BaseHTTPRequestHandler):
                 self.wfile.write(output)
                 print output
 
-            if self.path.endwith("/restaurant/delete"):
-                print "I'm here!"
+            if action == 'delete':
+                #deleteRestaurant = Restaurant(id = messagecontent[0])
+                #print deleteRestaurant
+                session.query(Restaurant).filter(Restaurant.id==messagecontent[0]).delete()
+                session.commit()
+                                
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                output = ""
+                output = ""                
                 output += "Attempting to delete a restaurant"
 
                 self.wfile.write(output)
@@ -125,7 +135,7 @@ class WebServerHandler(BaseHTTPRequestHandler):
 def main():
     try:
         port = 8080
-        server = HTTPServer(('', port), WebServerHandler)
+        server = HTTPServer(('', port), webServerHandler)
         print "Web Server running on port %s" % port
         server.serve_forever()
     except KeyboardInterrupt:
