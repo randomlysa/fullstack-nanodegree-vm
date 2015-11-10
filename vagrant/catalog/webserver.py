@@ -1,8 +1,10 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import cgi
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Restaurant, MenuItem
+
 engine = create_engine('sqlite:///restaurantmenu.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
@@ -108,8 +110,6 @@ class webServerHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            self.send_response(301)
-            self.end_headers()
 
             ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
             if ctype == 'multipart/form-data':
@@ -133,6 +133,7 @@ class webServerHandler(BaseHTTPRequestHandler):
                 session.add(addRestaurant)
                 session.commit()
 
+                '''
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
@@ -150,6 +151,7 @@ class webServerHandler(BaseHTTPRequestHandler):
 
                 self.wfile.write(output)
                 print output
+                '''
 
             # edit
             if action == 'edit':
@@ -158,7 +160,8 @@ class webServerHandler(BaseHTTPRequestHandler):
                 edit.name = message
                 session.add(edit)
                 session.commit()
-                                
+                
+                '''
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
@@ -167,6 +170,7 @@ class webServerHandler(BaseHTTPRequestHandler):
 
                 self.wfile.write(output)
                 print output
+                '''
                 
             # delete
             if action == 'delete':
@@ -174,7 +178,8 @@ class webServerHandler(BaseHTTPRequestHandler):
                 delete = session.query(Restaurant).filter_by(id = restaurantid).one()
                 session.delete(delete)
                 session.commit()
-                                
+                
+                '''
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
@@ -183,6 +188,12 @@ class webServerHandler(BaseHTTPRequestHandler):
 
                 self.wfile.write(output)
                 print output
+                '''
+                
+            self.send_response(301)
+            self.send_header('Content-type', 'text/html')
+            self.send_header('Location', '/restaurants')
+            self.end_headers()
 
         except:
             pass
