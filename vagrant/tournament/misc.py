@@ -8,6 +8,10 @@ import psycopg2
 
 from tournament import *
 
+#setTournamentAsActive(2)
+playerStandings()
+
+'''
 
 # Testing with 10 or 11 players 
 # Delete everything and register 10 or 11 players
@@ -41,6 +45,7 @@ reportMatch(id7, 'w', id8, 'l')
 reportMatch(id9, 'w', id10, 'l')
 
 
-
 pairings = swissPairings()
 # print pairings
+
+'''
