@@ -3,13 +3,32 @@
 # tournament.py -- implementation of a Swiss-system tournament
 #
 
-import psycopg2
+import psycopg2, contextlib
 
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
     return psycopg2.connect("dbname=tournament")
 
+@contextlib.contextmanager
+def get_cursor():
+    """
+    Simplifies connecting to a database and running queries.
+    Connect to database, get cursor, run query, commit query,
+    close cursor and connection.
+    """
+    conn = connect()
+    cur = conn.cursor()
+    try:
+        yield cur
+    except:
+        raise
+    else:
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
+    
 
 def createTournament(name, startdate):
     """Adds a tournament to the database. The tournament will NOT be set as active.
@@ -19,48 +38,39 @@ def createTournament(name, startdate):
     name - the name for the tournament
     startdate - the date the tournament starts
     """
-    conn = connect()
-    c = conn.cursor()
-    c.execute("\
-        INSERT INTO tournaments (name, startdate) \
-        VALUES (%s, %s)", (name, startdate,))
-    conn.commit()
+    with get_cursor() as cursor:
+        cursor.execute("\
+            INSERT INTO tournaments (name, startdate) \
+            VALUES (%s, %s)", (name, startdate,))
 
 
 def setTournamentAsActive(id):
     """Set a tournament to be active AND
     sets all other tournaments to be not active. """
 
-    conn = connect()
-    c = conn.cursor()
-    c.execute("UPDATE tournaments SET active = 0")
-    c.execute("UPDATE tournaments SET active = 1 where id = %s", (id,))
-    conn.commit()
+    with get_cursor() as cursor:
+        cursor.execute("UPDATE tournaments SET active = 0")
+        cursor.execute("UPDATE tournaments SET active = 1 where id = %s", (id,))
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    conn = connect()
-    c = conn.cursor()
-    c.execute("delete from matchresults")
-    conn.commit()
+    with get_cursor() as cursor:
+        cursor.execute("delete from matchresults")
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    conn = connect()
-    c = conn.cursor()
-    c.execute("delete from allplayers")
-    conn.commit()
+    with get_cursor() as cursor:
+        cursor.execute("delete from allplayers")
 
 
 def countPlayers():
     """Returns the number of players currently registered
     to the active tournament"""
-    conn = connect()
-    c = conn.cursor()
-    c.execute("SELECT count(*) from players")
-    return c.fetchone()[0]
+    with get_cursor() as cursor:
+        cursor.execute("SELECT count(*) from players")
+        return cursor.fetchone()[0]
 
 
 def registerPlayer(name, tid):
@@ -73,11 +83,10 @@ def registerPlayer(name, tid):
       name: the player's full name (need not be unique).
       tid = tournament id (the tournament must already be created)
     """
-    conn = connect()
-    c = conn.cursor()
-    c.execute("INSERT INTO allplayers (name, tournamentid) \
-            VALUES (%s, %s)", (name, tid,))
-    conn.commit()
+    with get_cursor() as cursor:
+        cursor.execute(
+                "INSERT INTO allplayers (name, tournamentid) \
+                VALUES (%s, %s)", (name, tid,))
 
 
 def playerStandings():
@@ -95,17 +104,17 @@ def playerStandings():
         matches: the number of matches the player has played
     """
 
-    conn = connect()
-    c = conn.cursor()
+    with get_cursor() as cursor:
     # count how many tournaments are set as active. there should only be one
-    c.execute("select * from tournaments where active = 1")
-    activetournaments = c.rowcount
+        cursor.execute("select * from tournaments where active = 1")
+        activetournaments = cursor.rowcount
     # count how many players are are registered to the active tournament
-    c.execute(
-        "select * from players where tournamentid = \
-        (select id from tournaments where active = 1)"
-    )
-    playersregisteredtoactivetournament = c.rowcount
+    with get_cursor() as cursor:
+        cursor.execute(
+            "select * from players where tournamentid = \
+            (select id from tournaments where active = 1)"
+        )
+        playersregisteredtoactivetournament = cursor.rowcount
     if activetournaments != 1:
         raise ValueError(
             " The number of tournaments set to 'active' is not exactly\
@@ -119,8 +128,9 @@ def playerStandings():
             registered."
         )
     else:
-        c.execute("select * from playerstandings")
-    return c.fetchall()
+        with get_cursor() as cursor:
+            cursor.execute("select * from playerstandings")
+            return cursor.fetchall()
 
 
 def reportMatch(player1, result1, player2=0, result2=0):
