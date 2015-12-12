@@ -1,0 +1,70 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	privateCatalog
+	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', catalog_id = catalog.id, type = 'header') }}')">
+		<div>
+			<h1>{{ catalog.name }}
+			<figure class="creator">
+				<img src="{{ url_for('static', filename='blank_user.gif') }}">
+				<figcaption>Catalog creator's name goes here</figcaption>
+			</figure>
+			</h1>
+
+		</div>
+	</div>
+
+<div class='flash'>
+		      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          
+        <ul>
+        {% for message in messages %}
+            <li> <strong> {{ message }} </strong> </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+
+</div>
+	
+	{# menu to edit catalog,  add item, or delete catalog #}
+	<div class="row padding-top padding-bottom">
+		<div class="col-md-1"></div>
+		<div class="col-md-11 padding-none">
+			<div class=dropdown">
+				<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+					Menu
+					<span class="caret"></span>
+				</button>
+				<ul class=dropdown-menu" aria-labelledby="dropdownMenu1">
+					<li><a href="{{url_for('editCatalog', catalog_id = catalog.id )}}">
+						Edit Catalog
+					</a></li>
+					<li><a href="{{url_for('newCatalogItem', catalog_id = catalog.id )}}">
+						Add Catalog Item
+					</a></li>
+					<li><a href="{{url_for('deleteCatalog', catalog_id = catalog.id )}}">
+						Delete Catalog
+					</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-md-7"></div>
+	</div>
+	{# end menu #}
+	
+	{% if items !=[] %}	
+		<div class="row">
+				<h2>Items</h2>
+					{% for i in items %}
+							<div class="menu-item">
+								<h3>{{i.name}}</h3>
+								<p>{{i.description}}</p>								
+								<a href='{{url_for('editCatalogItem', catalog_id = catalog.id, menu_id=i.id ) }}'>Edit</a> | 
+								<a href='{{url_for('deleteCatalogItem', catalog_id = catalog.id, menu_id=i.id ) }}'>Delete</a>
+							</div>						
+					{% endfor %}			
+		</div>
+	{% endif %}
+{% endblock %}

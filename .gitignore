@@ -12,3 +12,8 @@ vagrant/tournament/misc.py
 vagrant/tournament/test2.py
 vagrant/tournament/test1.py
 vagrant/tournament/misc.py
+vagrant/catalog/examples/lotsofmenus.py
+vagrant/catalog/examples/lotsofmenus2.py
+vagrant/catalog/examples/restaurantmenu.db
+vagrant/catalog/examples/restaurantmenuwithusers.db
+vagrant/catalog/pg_config.sh

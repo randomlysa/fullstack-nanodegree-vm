@@ -1,0 +1,46 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}	
+	<div class="row banner menu">
+		<div class="row banner menu img-rounded" style="background-image: url('{{ url_for('show_file', catalog_id = catalog.id, type = 'header') }}')">
+			<h1>Edit {{catalog.name}}</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6 col-md-offset-1 padding-top">
+			<form action="{{ url_for('editCatalog', catalog_id = catalog.id)}}" method = "post">
+				<div class="form-group">
+					<label for="name">Rename the catalog:</label>
+					<input type ="text" class="form-control" name="name" value="{{catalog.name }}">
+					<div class="padding-bottom"></div>
+					
+					<button type="submit" class="btn btn-default" id="submit" type="submit">
+						<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Save
+					</button>
+			
+					<a href='{{url_for('showCatalog', catalog_id = catalog.id)}}'>
+						<button type="button" class="btn btn-default delete">
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel - showcatalog
+						</button>
+					</a>
+				</div>
+			</form>
+			
+			<hr />
+			<label for="upload">Upload a header image:</label>
+			<form method=POST enctype=multipart/form-data action="{{ url_for('upload', catalog_id = catalog.id, type = header) }}">
+				<input class="btn btn-default" type='file' name='file'>
+				<button type="submit" class="btn btn-default" id="submit" type="submit">
+					<span class="glyphicon glyphicon-upload" aria-hidden="true"></span>Upload
+				</button>
+				
+				<a href='{{url_for('showCatalog', catalog_id = catalog.id)}}'>
+					<button type="button" class="btn btn-default delete">
+						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel - showcatalog
+					</button>
+				</a>
+			</form>
+			
+		</div>
+	</div>
+{% endblock %}
