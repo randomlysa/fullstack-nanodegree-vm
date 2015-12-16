@@ -427,27 +427,45 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-@app.route('/upload/<int:catalog_id>/',  methods=['GET', 'POST'])
-def upload(catalog_id):
+# id can be the id of the catalog or the item
+@app.route('/upload/<int:id>/<type>',  methods=['GET', 'POST'])
+def upload(id, type):
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_file(file.filename):
+            print "in the upload app"
             print file.filename
-            editedCatalog = session.query(
-                Catalog).filter_by(id=catalog_id).one()
             extension = file.filename.rsplit('.', 1)[1]
-            filename = "header_" + str(catalog_id) + "." + extension # secure_filename(file.filename)
+            filename = type + "_" + str(id) + "." + extension # secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             # add file to database
-            #catalog = session.query(Catalog).filter_by(id=catalog_id).one()
-            catalogToUpdate = session.query(Catalog).filter_by(id=catalog_id).one()
-            catalogToUpdate.header_image = filename
-            session.add(catalogToUpdate)
-            session.commit()
-
+            #catalog = session.query(Catalog).filter_by(id=id).one()
             
-            flash('Header image for catalog \'%s\' successfully uploaded' % editedCatalog.name)
-            return redirect(url_for('showCatalogs'))
+            if type == 'header':
+                print "UPLOADING header"
+                editedCatalog = session.query(Catalog).filter_by(id=id).one()
+                catalogToUpdate = session.query(Catalog).filter_by(id=id).one()
+                catalogToUpdate.header_image = filename
+                session.add(catalogToUpdate)
+                session.commit()
+                
+                flash('Header image for catalog \'%s\' successfully uploaded' % editedCatalog.name)
+                return redirect(url_for('showCatalogs'))
+                
+            elif type == 'item':
+                print "UPLOADING item"
+                itemToUpdate = session.query(CatalogItem).filter_by(id=id).one()
+                itemToUpdate.image = filename
+                print "item to update" + str(itemToUpdate)
+                print "filename" + str(filename)
+                session.add(itemToUpdate)
+                session.commit()
+                
+                flash('image for ITEM successfully uploaded')
+                return redirect(url_for('showCatalogs'))
+                
+            else:
+                print "nothing to upload!"
 
 @app.route('/uploads/<int:catalog_id>/<type>/')
 #def show_file(filename):
