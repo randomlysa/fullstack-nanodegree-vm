@@ -27,30 +27,27 @@
     {% endwith %}
 
 </div>
+
+	
 	
 	{# menu to edit catalog,  add item, or delete catalog #}
 	<div class="row padding-top padding-bottom">
-		<div class="col-md-1"></div>
-		<div class="col-md-11 padding-none">
-			<div class=dropdown">
-				<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-					Menu
-					<span class="caret"></span>
-				</button>
-				<ul class=dropdown-menu" aria-labelledby="dropdownMenu1">
-					<li><a href="{{url_for('editCatalog', catalog_id = catalog.id )}}">
-						Edit Catalog
-					</a></li>
-					<li><a href="{{url_for('newCatalogItem', catalog_id = catalog.id )}}">
-						Add Catalog Item
-					</a></li>
-					<li><a href="{{url_for('deleteCatalog', catalog_id = catalog.id )}}">
-						Delete Catalog
-					</a></li>
-				</ul>
-			</div>
-		</div>
-		<div class="col-md-7"></div>
+		<a href="{{url_for('editCatalog', catalog_id = catalog.id )}}">
+			<button type=button" class="btn btn-default" id="new-menu-item">
+				<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>Edit Catalog
+			</button>
+		</a>
+		
+		<a href="{{url_for('newCatalogItem', catalog_id = catalog.id )}}">
+			<button type="button" class="btn btn-default" id="new-menu-item">
+				<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add Catalog Item
+			</button>
+		
+		<a href="{{url_for('deleteCatalog', catalog_id = catalog.id )}}">
+			<button type="button" class="btn btn-default delete" id="delete-catalog">
+			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete Catalog
+			</button>
+		</a>
 	</div>
 	{# end menu #}
 	
