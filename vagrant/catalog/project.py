@@ -19,7 +19,7 @@ import requests
 # for uploads
 import os
 from flask import send_from_directory
-# for securing uploads
+# for securing uploads 
 from werkzeug import secure_filename
 
 app = Flask(__name__)
@@ -260,6 +260,11 @@ def gdisconnect():
 
 
 # JSON APIs to view Catalog Information
+@app.route('/catalog/JSON')
+def allCatalogsJSON():
+    catalogs = session.query(Catalog).all()
+    return jsonify(catalogs=[r.serialize for r in catalogs])
+
 @app.route('/catalog/<int:catalog_id>/catalog/JSON')
 def oneCatalogJSON(catalog_id):
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
@@ -267,17 +272,76 @@ def oneCatalogJSON(catalog_id):
         catalog_id=catalog_id).all()
     return jsonify(CatalogItems=[i.serialize for i in items])
 
-
-@app.route('/catalog/<int:catalog_id>/catalog/<int:menu_id>/JSON')
-def menuItemJSON(catalog_id, menu_id):
-    Catalog_Item = session.query(CatalogItem).filter_by(id=menu_id).one()
+@app.route('/catalog/<int:catalog_id>/catalog/<int:item_id>/JSON')
+def menuItemJSON(catalog_id, item_id):
+    Catalog_Item = session.query(CatalogItem).filter_by(id=item_id).one()
     return jsonify(Catalog_Item=Catalog_Item.serialize)
 
 
-@app.route('/catalog/JSON')
-def allCatalogsJSON():
-    catalogs = session.query(Catalog).all()
-    return jsonify(catalogs=[r.serialize for r in catalogs])
+# upload a photo for the catalog header or for a catalog item
+UPLOAD_FOLDER = "/vagrant/catalog/uploads/photos"
+ALLOWED_EXTENSIONS = set (['jpg', 'png', 'gif'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+# id can be the id of the catalog or the item
+@app.route('/upload/<int:id>/<type>',  methods=['GET', 'POST'])
+def upload(id, type):
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            print "in the upload app"
+            print file.filename
+            extension = file.filename.rsplit('.', 1)[1]
+            filename = type + "_" + str(id) + "." + extension # secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # add file to database
+            #catalog = session.query(Catalog).filter_by(id=id).one()
+            
+            if type == 'header':
+                print "UPLOADING header"
+                editedCatalog = session.query(Catalog).filter_by(id=id).one()
+                catalogToUpdate = session.query(Catalog).filter_by(id=id).one()
+                catalogToUpdate.header_image = filename
+                session.add(catalogToUpdate)
+                session.commit()
+                
+                flash('Header image for catalog \'%s\' successfully uploaded' % editedCatalog.name)
+                return redirect(url_for('showCatalogs'))
+                
+            elif type == 'item':
+                print "UPLOADING item"
+                itemToUpdate = session.query(CatalogItem).filter_by(id=id).one()
+                itemToUpdate.image = filename
+                print "item to update" + str(itemToUpdate)
+                print "filename" + str(filename)
+                session.add(itemToUpdate)
+                session.commit()
+                
+                flash('image for ITEM successfully uploaded')
+                return redirect(url_for('showCatalogs'))
+                
+            else:
+                print "nothing to upload!"
+
+@app.route('/uploads/<int:id>/<type>/')
+#def show_file(filename):
+def show_file(id, type):
+    print show_file
+    if type == 'header':
+        catalog = session.query(Catalog).filter_by(id=id).one()
+        filename = catalog.header_image
+        print filename
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+    if type == 'item':
+        catalog = session.query(CatalogItem).filter_by(id=id).one()
+        filename = id.image
+        print filename
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 # Show all catalogs
@@ -293,7 +357,6 @@ def showCatalogs():
         return render_template('privateCatalogs.html', catalogs=catalogs)
 
 # Create a new catalog
-
 
 @app.route('/catalog/new/', methods=['GET', 'POST'])
 def newCatalog():
@@ -366,28 +429,53 @@ def showCatalog(catalog_id):
             creator = creator)
 
 
-# Create a new menu item
+# Create a new catalog item
 @app.route('/catalog/<int:catalog_id>/catalog/new/', methods=['GET', 'POST'])
 def newCatalogItem(catalog_id):
     if 'username' not in login_session:
         return redirect('/login')
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     if request.method == 'POST':
+    
+        # check if an image was uploaded
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            print "in the upload app for newCatalogItem"
+            print file.filename
+            extension = file.filename.rsplit('.', 1)[1]
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # add file to database
+            #catalog = session.query(Catalog).filter_by(id=id).one()
+
+            print "UPLOADING item"
+            #itemToUpdate = session.query(CatalogItem).filter_by(id=id).one()
+            #itemToUpdate.image = filename
+            #print "item to update" + str(itemToUpdate)
+            #print "filename" + str(filename)
+            #session.add(itemToUpdate)
+            #session.commit()
+
+            #flash('image for ITEM successfully uploaded')
+            #return redirect(url_for('showCatalogs'))
+        # end of image upload section
+        
         newItem = CatalogItem(name=request.form['name'], description=request.form['description'], 
-                catalog_id=catalog_id, user_id=catalog.user_id)
+                image = filename, catalog_id=catalog_id, user_id=catalog.user_id)
         session.add(newItem)
         session.commit()
+        
         flash('New Catalog %s Item Successfully Created' % (newItem.name))
         return redirect(url_for('showCatalog', catalog_id=catalog_id))
     else:
         return render_template('newCatalogItem.html', catalog_id=catalog_id)
 
 # Edit a catalog item
-@app.route('/catalog/<int:catalog_id>/catalog/<int:menu_id>/edit', methods=['GET', 'POST'])
-def editCatalogItem(catalog_id, menu_id):
+@app.route('/catalog/<int:catalog_id>/catalog/<int:item_id>/edit', methods=['GET', 'POST'])
+def editCatalogItem(catalog_id, item_id):
     if 'username' not in login_session:
         return redirect('/login')
-    editedItem = session.query(CatalogItem).filter_by(id=menu_id).one()
+    editedItem = session.query(CatalogItem).filter_by(id=item_id).one()
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     if request.method == 'POST':
         if request.form['name']:
@@ -399,16 +487,16 @@ def editCatalogItem(catalog_id, menu_id):
         flash('Catalog Item Successfully Edited')
         return redirect(url_for('showCatalog', catalog_id=catalog_id))
     else:
-        return render_template('editCatalogItem.html', catalog_id=catalog_id, menu_id=menu_id, item=editedItem)
+        return render_template('editCatalogItem.html', catalog_id=catalog_id, item_id=item_id, item=editedItem)
 
 
-# Delete a menu item
-@app.route('/catalog/<int:catalog_id>/catalog/<int:menu_id>/delete', methods=['GET', 'POST'])
-def deleteCatalogItem(catalog_id, menu_id):
+# Delete a catalog item
+@app.route('/catalog/<int:catalog_id>/catalog/<int:item_id>/delete', methods=['GET', 'POST'])
+def deleteCatalogItem(catalog_id, item_id):
     if 'username' not in login_session:
         return redirect('/login')
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
-    itemToDelete = session.query(CatalogItem).filter_by(id=menu_id).one()
+    itemToDelete = session.query(CatalogItem).filter_by(id=item_id).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
@@ -418,64 +506,6 @@ def deleteCatalogItem(catalog_id, menu_id):
         flash('Catalog Item \'%s\' NOT Deleted' % itemToDelete.name)
         return render_template('deleteCatalogItem.html', item=itemToDelete)
 
-# upload a photo for the catalog header
-UPLOAD_FOLDER = "/vagrant/catalog/uploads/photos"
-ALLOWED_EXTENSIONS = set (['jpg', 'png', 'gif'])
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-# id can be the id of the catalog or the item
-@app.route('/upload/<int:id>/<type>',  methods=['GET', 'POST'])
-def upload(id, type):
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            print "in the upload app"
-            print file.filename
-            extension = file.filename.rsplit('.', 1)[1]
-            filename = type + "_" + str(id) + "." + extension # secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            # add file to database
-            #catalog = session.query(Catalog).filter_by(id=id).one()
-            
-            if type == 'header':
-                print "UPLOADING header"
-                editedCatalog = session.query(Catalog).filter_by(id=id).one()
-                catalogToUpdate = session.query(Catalog).filter_by(id=id).one()
-                catalogToUpdate.header_image = filename
-                session.add(catalogToUpdate)
-                session.commit()
-                
-                flash('Header image for catalog \'%s\' successfully uploaded' % editedCatalog.name)
-                return redirect(url_for('showCatalogs'))
-                
-            elif type == 'item':
-                print "UPLOADING item"
-                itemToUpdate = session.query(CatalogItem).filter_by(id=id).one()
-                itemToUpdate.image = filename
-                print "item to update" + str(itemToUpdate)
-                print "filename" + str(filename)
-                session.add(itemToUpdate)
-                session.commit()
-                
-                flash('image for ITEM successfully uploaded')
-                return redirect(url_for('showCatalogs'))
-                
-            else:
-                print "nothing to upload!"
-
-@app.route('/uploads/<int:catalog_id>/<type>/')
-#def show_file(filename):
-def show_file(catalog_id, type):
-    print show_file
-    if type == 'header':
-        catalog = session.query(Catalog).filter_by(id=catalog_id).one()
-        filename = catalog.header_image
-        print filename
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     
 # DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route('/disconnect')
