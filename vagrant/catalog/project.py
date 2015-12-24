@@ -261,7 +261,7 @@ def gdisconnect():
 
 # JSON APIs to view Catalog Information
 @app.route('/catalog/<int:catalog_id>/catalog/JSON')
-def catalogCatalogJSON(catalog_id):
+def oneCatalogJSON(catalog_id):
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     items = session.query(CatalogItem).filter_by(
         catalog_id=catalog_id).all()
@@ -275,7 +275,7 @@ def menuItemJSON(catalog_id, menu_id):
 
 
 @app.route('/catalog/JSON')
-def catalogsJSON():
+def allCatalogsJSON():
     catalogs = session.query(Catalog).all()
     return jsonify(catalogs=[r.serialize for r in catalogs])
 
