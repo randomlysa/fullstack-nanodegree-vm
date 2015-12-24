@@ -2,7 +2,7 @@
 {% block content %}
 {% include "header.html" %}	
 	<div class="row banner menu">
-		<div class="row banner menu img-rounded" style="background-image: url('{{ url_for('show_file', catalog_id = catalog.id, type = 'header') }}')">
+		<div class="row banner menu img-rounded" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header') }}')">
 			<h1>Edit {{catalog.name}}</h1>
 		</div>
 	</div>

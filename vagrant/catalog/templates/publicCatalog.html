@@ -2,7 +2,7 @@
 {% block content %}
 {% include "header.html" %}
 	publicCatalog
-	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', catalog_id = catalog.id, type = 'header') }}')">
+	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header') }}')">
 		<div class="col-md-12">
 			<h1>{{ catalog.name }}			
 				<figure class="creator">
@@ -34,14 +34,16 @@
 	{% if items !=[] %}	
 		<div class="row">			
 				<h2>Items</h2>
-					{% for i in items %}						
+					{% for i in items %}
 							<div class="menu-item">
 								<h3>{{i.name}}</h3>
 								<p>{{i.description}}</p>
-								<p class="menu-price">{{i.price}}</p>
-								
-							</div>						
-					{% endfor %}			
+								<p><a href="{{url_for('menuItemJSON', catalog_id = catalog.id, item_id = i.id)}}">JSON</a></p>
+							</div>
+					{% endfor %}
 		</div>
 	{% endif %}
+	<div class="col-md-8"></div>
+		<a href="{{ url_for('oneCatalogJSON', catalog_id = catalog.id) }}">View JSON</a>
+	</div>
 {% endblock %}

@@ -2,7 +2,7 @@
 {% block content %}
 {% include "header.html" %}
 	privateCatalog
-	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', catalog_id = catalog.id, type = 'header') }}')">
+	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header') }}')">
 		<div>
 			<h1>{{ catalog.name }}
 			<figure class="creator">
@@ -57,11 +57,18 @@
 					{% for i in items %}
 							<div class="menu-item">
 								<h3>{{i.name}}</h3>
-								<p>{{i.description}}</p>								
-								<a href='{{url_for('editCatalogItem', catalog_id = catalog.id, menu_id=i.id ) }}'>Edit</a> | 
-								<a href='{{url_for('deleteCatalogItem', catalog_id = catalog.id, menu_id=i.id ) }}'>Delete</a>
+								<p>{{i.description}}</p>
+								<p>{{i.image}}</p>
+								<p><a href="{{url_for('menuItemJSON', catalog_id = catalog.id, item_id = i.id)}}">JSON</a></p>
+								<a href='{{url_for('editCatalogItem', catalog_id = catalog.id, item_id=i.id ) }}'>Edit</a> | 
+								<a href='{{url_for('deleteCatalogItem', catalog_id = catalog.id, item_id=i.id ) }}'>Delete</a>
 							</div>						
 					{% endfor %}			
 		</div>
 	{% endif %}
+	
+	<div class="col-md-8"></div>
+		<a href="{{ url_for('oneCatalogJSON', catalog_id = catalog.id) }}">View JSON</a>
+	</div>
+	
 {% endblock %}
