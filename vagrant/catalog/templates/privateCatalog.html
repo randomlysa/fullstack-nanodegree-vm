@@ -58,7 +58,10 @@
 							<div class="menu-item">
 								<h3>{{i.name}}</h3>
 								<p>{{i.description}}</p>
-								<p>{{i.image}}</p>
+								{% if i.image %}
+									<img src="{{ url_for('show_file', id = i.id, type = 'item') }}" 
+									class="img-responsive img-rounded" >
+								{% endif %}
 								<p><a href="{{url_for('menuItemJSON', catalog_id = catalog.id, item_id = i.id)}}">JSON</a></p>
 								<a href='{{url_for('editCatalogItem', catalog_id = catalog.id, item_id=i.id ) }}'>Edit</a> | 
 								<a href='{{url_for('deleteCatalogItem', catalog_id = catalog.id, item_id=i.id ) }}'>Delete</a>

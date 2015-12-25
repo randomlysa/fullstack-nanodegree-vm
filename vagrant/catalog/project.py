@@ -330,18 +330,18 @@ def upload(id, type):
 @app.route('/uploads/<int:id>/<type>/')
 #def show_file(filename):
 def show_file(id, type):
-    print show_file
     if type == 'header':
+        #print "type = header"
         catalog = session.query(Catalog).filter_by(id=id).one()
-        filename = catalog.header_image
-        print filename
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
+        filename = catalog.header_image        
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename) 
     if type == 'item':
-        catalog = session.query(CatalogItem).filter_by(id=id).one()
-        filename = id.image
-        print filename
+        #print "type = item"
+        item = session.query(CatalogItem).filter_by(id=id).one()
+        filename = item.image
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    else:
+        print "there is a problem"
 
 
 # Show all catalogs
