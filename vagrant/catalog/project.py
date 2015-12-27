@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, redirect, \
+    jsonify, url_for, flash
 
 
 from sqlalchemy import create_engine, asc
@@ -19,7 +20,7 @@ import requests
 # for uploads
 import os
 from flask import send_from_directory
-# for securing uploads 
+# for securing uploads
 from werkzeug import secure_filename
 
 app = Flask(__name__)
@@ -46,7 +47,7 @@ def showLogin():
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
-    
+
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
     if request.args.get('state') != login_session['state']:
@@ -70,7 +71,6 @@ def fbconnect():
     # strip expire tag from access token
     token = result.split("&")[0]
 
-
     url = 'https://graph.facebook.com/v2.4/me?%s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
@@ -82,7 +82,8 @@ def fbconnect():
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
 
-    # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
+    # The token must be stored in the login_session in order to properly logout,
+    # let's strip out the information before the equals sign in our token
     stored_token = token.split("=")[1]
     login_session['access_token'] = stored_token
 
@@ -107,23 +108,26 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: \
+                    150px;-webkit-border-radius: 150px;-moz-border-radius: \
+                    150px;"> '
 
     flash("Now logged in as %s" % login_session['username'])
     return output
 
-    
+
 @app.route('/fbdisconnect')
 def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
     access_token = login_session['access_token']
-    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s'\
+        % (facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
     return "you have been logged out"
-    
-    
+
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -175,7 +179,9 @@ def gconnect():
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps(
+                                'Current user is already connected.'
+        ),
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -201,21 +207,22 @@ def gconnect():
     if not user_id:
         user_id = createUser(login_session)
     login_session['user_id'] = user_id
-    
-    
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += '" style = "width: 300px; height: 300px;border-radius: \
+                150px;-webkit-border-radius: 150px;-moz-border-radius: \
+                150px;">'
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
 
-# User Helper Functions
 
+# User Helper Functions
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
@@ -265,12 +272,14 @@ def allCatalogsJSON():
     catalogs = session.query(Catalog).all()
     return jsonify(catalogs=[r.serialize for r in catalogs])
 
+
 @app.route('/catalog/<int:catalog_id>/catalog/JSON')
 def oneCatalogJSON(catalog_id):
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     items = session.query(CatalogItem).filter_by(
         catalog_id=catalog_id).all()
     return jsonify(CatalogItems=[i.serialize for i in items])
+
 
 @app.route('/catalog/<int:catalog_id>/catalog/<int:item_id>/JSON')
 def menuItemJSON(catalog_id, item_id):
@@ -280,12 +289,14 @@ def menuItemJSON(catalog_id, item_id):
 
 # upload a photo for the catalog header or for a catalog item
 UPLOAD_FOLDER = "/vagrant/catalog/uploads/photos"
-ALLOWED_EXTENSIONS = set (['jpg', 'png', 'gif'])
+ALLOWED_EXTENSIONS = set(['jpg', 'png', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
 
 # id can be the id of the catalog or the item
 @app.route('/upload/<int:id>/<type>',  methods=['GET', 'POST'])
@@ -296,11 +307,13 @@ def upload(id, type):
             print "in the upload app"
             print file.filename
             extension = file.filename.rsplit('.', 1)[1]
-            filename = type + "_" + str(id) + "." + extension # secure_filename(file.filename)
+
+            # secure_filename(file.filename)
+            filename = type + "_" + str(id) + "." + extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             # add file to database
-            #catalog = session.query(Catalog).filter_by(id=id).one()
-            
+            # catalog = session.query(Catalog).filter_by(id=id).one()
+
             if type == 'header':
                 print "UPLOADING header"
                 editedCatalog = session.query(Catalog).filter_by(id=id).one()
@@ -308,35 +321,40 @@ def upload(id, type):
                 catalogToUpdate.header_image = filename
                 session.add(catalogToUpdate)
                 session.commit()
-                
-                flash('Header image for catalog \'%s\' successfully uploaded' % editedCatalog.name)
+
+                flash(
+                    'Header image for catalog \'%s\' successfully uploaded'
+                    % editedCatalog.name
+                )
                 return redirect(url_for('showCatalogs'))
-                
+
             elif type == 'item':
                 print "UPLOADING item"
-                itemToUpdate = session.query(CatalogItem).filter_by(id=id).one()
+                itemToUpdate = session.query(CatalogItem).\
+                    filter_by(id=id).one()
                 itemToUpdate.image = filename
                 print "item to update" + str(itemToUpdate)
                 print "filename" + str(filename)
                 session.add(itemToUpdate)
                 session.commit()
-                
+
                 flash('image for ITEM successfully uploaded')
                 return redirect(url_for('showCatalogs'))
-                
+
             else:
                 print "nothing to upload!"
 
+
 @app.route('/uploads/<int:id>/<type>/')
-#def show_file(filename):
+# def show_file(filename):
 def show_file(id, type):
     if type == 'header':
-        #print "type = header"
+        # print "type = header"
         catalog = session.query(Catalog).filter_by(id=id).one()
-        filename = catalog.header_image        
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename) 
+        filename = catalog.header_image
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     if type == 'item':
-        #print "type = item"
+        # print "type = item"
         item = session.query(CatalogItem).filter_by(id=id).one()
         filename = item.image
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
@@ -350,14 +368,16 @@ def show_file(id, type):
 def showCatalogs():
     catalogs = session.query(Catalog).order_by(asc(Catalog.name))
     users = session.query(User).order_by(asc(User.name))
-    
+
     if 'username' not in login_session:
-        return render_template('publicCatalogs.html', catalogs = catalogs, users = users)
+        return render_template(
+                        'publicCatalogs.html', catalogs=catalogs, users=users
+        )
     else:
         return render_template('privateCatalogs.html', catalogs=catalogs)
 
-# Create a new catalog
 
+# Create a new catalog
 @app.route('/catalog/new/', methods=['GET', 'POST'])
 def newCatalog():
     if 'username' not in login_session:
@@ -372,21 +392,23 @@ def newCatalog():
     else:
         return render_template('newCatalog.html')
 
+
 # Edit a catalog
 @app.route('/catalog/<int:catalog_id>/edit/', methods=['GET', 'POST'])
 def editCatalog(catalog_id):
     if 'username' not in login_session:
         return redirect('/login')
-        
+
     editedCatalog = session.query(
         Catalog).filter_by(id=catalog_id).one()
     # two lines for debugging
     print editedCatalog.user_id
     print login_session['user_id']
-    
+
     if editedCatalog.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to edit this \
-            catalog. Please create your own!');}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not \
+                    authorized to edit this catalog. Please create your\
+                    own!');}</script><body onload='myFunction()'>"
 
     if request.method == 'POST':
         if request.form['name']:
@@ -394,7 +416,7 @@ def editCatalog(catalog_id):
             flash('Catalog Successfully Edited %s' % editedCatalog.name)
             return redirect(url_for('showCatalogs'))
     else:
-        return render_template('editCatalog.html', catalog=editedCatalog)        
+        return render_template('editCatalog.html', catalog=editedCatalog)
 
 
 # Delete a catalog
@@ -413,20 +435,25 @@ def deleteCatalog(catalog_id):
         flash('Catalog \'%s\' NOT Deleted' % catalogToDelete.name)
         return render_template('deleteCatalog.html', catalog=catalogToDelete)
 
-# Show a catalog 
+
+# Show a catalog
 @app.route('/catalog/<int:catalog_id>/')
 @app.route('/catalog/<int:catalog_id>/catalog/')
 def showCatalog(catalog_id):
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     creator = getUserInfo(catalog.user_id)
     items = session.query(CatalogItem).filter_by(
-        catalog_id=catalog_id).all()        
+        catalog_id=catalog_id).all()
     if 'username' not in login_session or creator.id != login_session['user_id']:
-        return render_template('publicCatalog.html', items = items, 
-            catalog=catalog, creator = creator)
+        return render_template(
+                        'publicCatalog.html', items=items,
+                        catalog=catalog, creator=creator
+        )
     else:
-        return render_template('privateCatalog.html', items=items, catalog=catalog, 
-            creator = creator)
+        return render_template(
+                        'privateCatalog.html', items=items,
+                        catalog=catalog, creator=creator
+        )
 
 
 # Create a new catalog item
@@ -436,7 +463,7 @@ def newCatalogItem(catalog_id):
         return redirect('/login')
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     if request.method == 'POST':
-    
+
         # check if an image was uploaded
         file = request.files['file']
         if file and allowed_file(file.filename):
@@ -446,32 +473,40 @@ def newCatalogItem(catalog_id):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             # add file to database
-            #catalog = session.query(Catalog).filter_by(id=id).one()
+            # catalog = session.query(Catalog).filter_by(id=id).one()
 
-            print "UPLOADING item"
-            #itemToUpdate = session.query(CatalogItem).filter_by(id=id).one()
-            #itemToUpdate.image = filename
-            #print "item to update" + str(itemToUpdate)
-            #print "filename" + str(filename)
-            #session.add(itemToUpdate)
-            #session.commit()
+            # print "UPLOADING item"
+            # itemToUpdate = session.query(CatalogItem).filter_by(id=id).one()
+            # itemToUpdate.image = filename
+            # print "item to update" + str(itemToUpdate)
+            # print "filename" + str(filename)
+            # session.add(itemToUpdate)
+            # session.commit()
 
-            #flash('image for ITEM successfully uploaded')
-            #return redirect(url_for('showCatalogs'))
+            # flash('image for ITEM successfully uploaded')
+            # return redirect(url_for('showCatalogs'))
         # end of image upload section
-        
-        newItem = CatalogItem(name=request.form['name'], description=request.form['description'], 
-                image = filename, catalog_id=catalog_id, user_id=catalog.user_id)
+
+        newItem = CatalogItem(
+                        name=request.form['name'],
+                        description=request.form['description'],
+                        image=filename,
+                        catalog_id=catalog_id, user_id=catalog.user_id
+        )
         session.add(newItem)
         session.commit()
-        
-        flash('New Catalog %s Item Successfully Created' % (newItem.name))
+
+        flash('New Item %s Successfully Created' % (newItem.name))
         return redirect(url_for('showCatalog', catalog_id=catalog_id))
     else:
         return render_template('newCatalogItem.html', catalog_id=catalog_id)
 
+
 # Edit a catalog item
-@app.route('/catalog/<int:catalog_id>/catalog/<int:item_id>/edit', methods=['GET', 'POST'])
+@app.route(
+        '/catalog/<int:catalog_id>/catalog/<int:item_id>/edit',
+        methods=['GET', 'POST']
+)
 def editCatalogItem(catalog_id, item_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -487,11 +522,17 @@ def editCatalogItem(catalog_id, item_id):
         flash('Catalog Item Successfully Edited')
         return redirect(url_for('showCatalog', catalog_id=catalog_id))
     else:
-        return render_template('editCatalogItem.html', catalog_id=catalog_id, item_id=item_id, item=editedItem)
+        return render_template(
+                'editCatalogItem.html', catalog_id=catalog_id,
+                item_id=item_id, item=editedItem
+        )
 
 
 # Delete a catalog item
-@app.route('/catalog/<int:catalog_id>/catalog/<int:item_id>/delete', methods=['GET', 'POST'])
+@app.route(
+        '/catalog/<int:catalog_id>/catalog/<int:item_id>/delete',
+        methods=['GET', 'POST']
+)
 def deleteCatalogItem(catalog_id, item_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -506,7 +547,7 @@ def deleteCatalogItem(catalog_id, item_id):
         flash('Catalog Item \'%s\' NOT Deleted' % itemToDelete.name)
         return render_template('deleteCatalogItem.html', item=itemToDelete)
 
-    
+
 # DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route('/disconnect')
 def disconnect():
