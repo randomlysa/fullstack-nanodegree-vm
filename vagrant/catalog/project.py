@@ -368,9 +368,10 @@ def show_file(id, type):
         filename = catalog.header_image
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     if type == 'item':
-        # print "type = item"
+        print "type = item"
         item = session.query(CatalogItem).filter_by(id=id).one()
         filename = item.image
+        print "filename" + filename
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     else:
         print "there is a problem"
@@ -428,7 +429,7 @@ def editCatalog(catalog_id):
         # check if an image was uploaded
         file = request.files['file']
         if file and allowed_file(file.filename):
-            print "in the upload app for newCatalogItem"
+            print "in the upload app for editCatalogItem"
             print file.filename
             extension = file.filename.rsplit('.', 1)[1]
             filename = secure_filename(file.filename)
@@ -495,6 +496,10 @@ def newCatalogItem(catalog_id):
             print file.filename
             extension = file.filename.rsplit('.', 1)[1]
             filename = secure_filename(file.filename)
+            lastId = session.query(CatalogItem).order_by(CatalogItem.id.desc()).first()            
+            nextId = lastId.id + 1
+            filename = "user" + str(login_session['user_id']) + "_catalog" + \
+                str(catalog_id) + "_item" + str(nextId) + "." + extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             # add file to database
             # catalog = session.query(Catalog).filter_by(id=id).one()
