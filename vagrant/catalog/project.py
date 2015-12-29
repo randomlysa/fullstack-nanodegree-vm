@@ -513,6 +513,16 @@ def editCatalogItem(catalog_id, item_id):
     editedItem = session.query(CatalogItem).filter_by(id=item_id).one()
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     if request.method == 'POST':
+        # check if an image was uploaded
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            print "in the upload app for newCatalogItem"
+            print file.filename
+            extension = file.filename.rsplit('.', 1)[1]
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        # end of upload section
+
         if request.form['name']:
             editedItem.name = request.form['name']
         if request.form['description']:
