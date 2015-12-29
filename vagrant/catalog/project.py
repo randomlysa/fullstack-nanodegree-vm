@@ -368,9 +368,8 @@ def show_file(id, type):
         try:
             filename = catalog.header_image
             return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-        except:
-            print "file does not exist"
-            return
+        except:            
+            return "file does not exist"
 
     if type == 'item':
         print "type = item"
