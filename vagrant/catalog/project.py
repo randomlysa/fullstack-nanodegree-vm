@@ -501,8 +501,12 @@ def newCatalogItem(catalog_id):
             print file.filename
             extension = file.filename.rsplit('.', 1)[1]
             filename = secure_filename(file.filename)
-            lastId = session.query(CatalogItem).order_by(CatalogItem.id.desc()).first()            
-            nextId = lastId.id + 1
+            lastId = session.query(CatalogItem).order_by(CatalogItem.id.desc()).first()
+            # for the first item in the database, lastId will not have an .id
+            try:
+                nextId = lastId.id + 1
+            except AttributeError:
+                nextId = 1
             filename = "user" + str(login_session['user_id']) + "_catalog" + \
                 str(catalog_id) + "_item" + str(nextId) + "." + extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
