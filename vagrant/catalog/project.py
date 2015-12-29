@@ -523,27 +523,21 @@ def newCatalogItem(catalog_id):
             filename = "user" + str(login_session['user_id']) + "_catalog" + \
                 str(catalog_id) + "_item" + str(nextId) + "." + extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            # add file to database
-            # catalog = session.query(Catalog).filter_by(id=id).one()
 
-            # print "UPLOADING item"
-            # itemToUpdate = session.query(CatalogItem).filter_by(id=id).one()
-            # itemToUpdate.image = filename
-            # print "item to update" + str(itemToUpdate)
-            # print "filename" + str(filename)
-            # session.add(itemToUpdate)
-            # session.commit()
-
-            # flash('image for ITEM successfully uploaded')
-            # return redirect(url_for('showCatalogs'))
-        # end of image upload section
-
-        newItem = CatalogItem(
+            newItem = CatalogItem(
                         name=request.form['name'],
                         description=request.form['description'],
                         image=filename,
                         catalog_id=catalog_id, user_id=catalog.user_id
-        )
+            )
+        # end of image upload section
+        # if no image was uploaded, newItem will not have a filename
+        else:
+            newItem = CatalogItem(
+                        name=request.form['name'],
+                        description=request.form['description'],                        
+                        catalog_id=catalog_id, user_id=catalog.user_id
+            )
         session.add(newItem)
         session.commit()
 
