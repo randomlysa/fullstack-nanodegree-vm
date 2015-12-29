@@ -288,6 +288,19 @@ def menuItemJSON(catalog_id, item_id):
 
 
 # upload a photo for the catalog header or for a catalog item
+'''
+    problems:
+        (edit) when a new image is uploaded, the old one is not deleted
+        (edit or new) files are all stores in the same directory with the original filename
+            if the same image is used for two items, and one item is delete, the image will be
+            deleted for the other item
+    possible solution - rename images:
+        for catalog header: %user%_header_%catalogid% (since id is unique)
+        for catalog items: %user%_%catalogid%_item_%itemid%
+        - will not have to delete old image when editing since the new image will have the same 
+            name as the old image and overwrite it
+        - each image will have a unique name
+'''
 UPLOAD_FOLDER = "/vagrant/catalog/uploads/photos"
 ALLOWED_EXTENSIONS = set(['jpg', 'png', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -529,6 +542,9 @@ def editCatalogItem(catalog_id, item_id):
         if file and allowed_file(file.filename):
             print "in the upload app for newCatalogItem"
             print file.filename
+            # make sure to update the filename in the database
+            editedItem.image = file.filename
+            
             extension = file.filename.rsplit('.', 1)[1]
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -537,7 +553,7 @@ def editCatalogItem(catalog_id, item_id):
         if request.form['name']:
             editedItem.name = request.form['name']
         if request.form['description']:
-            editedItem.description = request.form['description']
+            editedItem.description = request.form['description']        
         session.add(editedItem)
         session.commit()
         flash('Catalog Item Successfully Edited')
@@ -560,6 +576,11 @@ def deleteCatalogItem(catalog_id, item_id):
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     itemToDelete = session.query(CatalogItem).filter_by(id=item_id).one()
     if request.method == 'POST':
+        # check if there is an image to delete
+        if itemToDelete.image:
+            print "image to delete: " + itemToDelete.image
+            os.remove("/vagrant/catalog/uploads/photos/" + itemToDelete.image)
+        # end delete image
         session.delete(itemToDelete)
         session.commit()
         flash('Catalog Item \'%s\' Successfully Deleted' % itemToDelete.name)
