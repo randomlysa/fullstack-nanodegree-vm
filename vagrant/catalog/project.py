@@ -365,8 +365,13 @@ def show_file(id, type):
     if type == 'header':
         # print "type = header"
         catalog = session.query(Catalog).filter_by(id=id).one()
-        filename = catalog.header_image
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        try:
+            filename = catalog.header_image
+            return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        except:
+            print "file does not exist"
+            return
+
     if type == 'item':
         print "type = item"
         item = session.query(CatalogItem).filter_by(id=id).one()
@@ -429,11 +434,19 @@ def editCatalog(catalog_id):
         # check if an image was uploaded
         file = request.files['file']
         if file and allowed_file(file.filename):
-            print "in the upload app for editCatalog"
-            print file.filename
+            # print "in the upload app for editCatalog"
+
             extension = file.filename.rsplit('.', 1)[1]
+            # original filename secured
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            # renamed filename user#_catalog#_header.(extension)
+            newFilename = "user" + str(login_session['user_id']) + "_catalog" + \
+                str(catalog_id) + "_header" "." + extension
+
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
+            # make sure to update the renamed filename in the database
+            editedCatalog.header_image = newFilename
         # end of upload section
         
         if request.form['name']:
