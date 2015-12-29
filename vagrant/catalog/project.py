@@ -429,7 +429,7 @@ def editCatalog(catalog_id):
         # check if an image was uploaded
         file = request.files['file']
         if file and allowed_file(file.filename):
-            print "in the upload app for editCatalogItem"
+            print "in the upload app for editCatalog"
             print file.filename
             extension = file.filename.rsplit('.', 1)[1]
             filename = secure_filename(file.filename)
@@ -545,14 +545,20 @@ def editCatalogItem(catalog_id, item_id):
         # check if an image was uploaded
         file = request.files['file']
         if file and allowed_file(file.filename):
-            print "in the upload app for newCatalogItem"
-            print file.filename
-            # make sure to update the filename in the database
-            editedItem.image = file.filename
-            
+            # print "in the upload app for newCatalogItem"
+
             extension = file.filename.rsplit('.', 1)[1]
+            # original filename secured
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            # renamed filename user#_catalog#_item#.(extension)
+            newFilename = "user" + str(login_session['user_id']) + "_catalog" + \
+                str(catalog_id) + "_item" + str(item_id) + "." + extension
+
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
+            # make sure to update the renamed filename in the database
+            editedItem.image = newFilename
+
         # end of upload section
 
         if request.form['name']:
