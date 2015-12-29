@@ -450,8 +450,13 @@ def deleteCatalog(catalog_id):
     if 'username' not in login_session:
         return redirect('/login')
     catalogToDelete = session.query(
-        Catalog).filter_by(id=catalog_id).one()
+        Catalog).filter_by(id=catalog_id).one()    
+    # items associated with the catalog, to be deleted
+    catalogItemsToDelete = session.query(CatalogItem).filter_by(catalog_id=catalogToDelete.id)
     if request.method == 'POST':
+        for deleteThis in catalogItemsToDelete:        
+            os.remove("/vagrant/catalog/uploads/photos/" + deleteThis.image)
+            session.delete(deleteThis)
         session.delete(catalogToDelete)
         flash('Catalog \'%s\' Successfully Deleted' % catalogToDelete.name)
         session.commit()
