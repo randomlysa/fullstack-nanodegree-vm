@@ -297,7 +297,8 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-
+'''
+no longer needed since each app that needs upload has it (?)
 # id can be the id of the catalog or the item
 @app.route('/upload/<int:id>/<type>',  methods=['GET', 'POST'])
 def upload(id, type):
@@ -343,7 +344,7 @@ def upload(id, type):
 
             else:
                 print "nothing to upload!"
-
+'''
 
 @app.route('/uploads/<int:id>/<type>/')
 # def show_file(filename):
@@ -411,6 +412,16 @@ def editCatalog(catalog_id):
                     own!');}</script><body onload='myFunction()'>"
 
     if request.method == 'POST':
+        # check if an image was uploaded
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            print "in the upload app for newCatalogItem"
+            print file.filename
+            extension = file.filename.rsplit('.', 1)[1]
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        # end of upload section
+        
         if request.form['name']:
             editedCatalog.name = request.form['name']
             flash('Catalog Successfully Edited %s' % editedCatalog.name)
