@@ -38,6 +38,10 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
+@app.route('/error')
+def error():
+    return render_template('error.html')
+
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
@@ -402,9 +406,44 @@ def newCatalog():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
+        '''
+            newCatalog = Catalog(
+                name=request.form['name'], user_id=login_session['user_id'],
+                header_image=request.form['image']
+                )
+            '''
         newCatalog = Catalog(
-            name=request.form['name'], user_id=login_session['user_id'])
+                name=request.form['name'], user_id=login_session['user_id']
+        )
+
         session.add(newCatalog)
+        
+        # get id of catalog that was created
+        # this is probably not the best way to do this...
+        lastCatalog = session.query(Catalog).order_by(Catalog.id.desc()).first()
+        catalog_id = lastCatalog.id
+        
+        # check if an image was uploaded
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            # print "in the upload app for newCatalog"
+
+            extension = file.filename.rsplit('.', 1)[1]
+            # original filename secured
+            filename = secure_filename(file.filename)
+
+            # renamed filename user#_catalog#_header.(extension)
+            newFilename = "user" + str(login_session['user_id']) + "_catalog" + \
+                str(catalog_id) + "_header" "." + extension
+
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
+            # make sure to update the renamed filename in the database
+            lastCatalog.header_image = newFilename
+            
+            session.add(lastCatalog)
+            session.commit()
+        # end of upload section
+
         flash('New Catalog %s Successfully Created' % newCatalog.name)
         session.commit()
         return redirect(url_for('showCatalogs'))
@@ -461,8 +500,11 @@ def editCatalog(catalog_id):
 def deleteCatalog(catalog_id):
     if 'username' not in login_session:
         return redirect('/login')
+
     catalogToDelete = session.query(
-        Catalog).filter_by(id=catalog_id).one()    
+        Catalog).filter_by(id=catalog_id).one()
+
+
     # items associated with the catalog, to be deleted
     catalogItemsToDelete = session.query(CatalogItem).filter_by(catalog_id=catalogToDelete.id)
     if request.method == 'POST':
