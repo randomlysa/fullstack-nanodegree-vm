@@ -474,7 +474,7 @@ def deleteCatalog(catalog_id):
         session.commit()
         return redirect(url_for('showCatalogs', catalog_id=catalog_id))
     else:
-        flash('Catalog \'%s\' NOT Deleted' % catalogToDelete.name)
+        # flash('Catalog \'%s\' NOT Deleted' % catalogToDelete.name)
         return render_template('deleteCatalog.html', catalog=catalogToDelete)
 
 
@@ -601,8 +601,10 @@ def deleteCatalogItem(catalog_id, item_id):
         return redirect('/login')
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     itemToDelete = session.query(CatalogItem).filter_by(id=item_id).one()
+    
     if request.method == 'POST':
         # check if there is an image to delete
+        print "in the post"
         if itemToDelete.image:
             print "image to delete: " + itemToDelete.image
             os.remove("/vagrant/catalog/uploads/photos/" + itemToDelete.image)
@@ -611,8 +613,10 @@ def deleteCatalogItem(catalog_id, item_id):
         session.commit()
         flash('Catalog Item \'%s\' Successfully Deleted' % itemToDelete.name)
         return redirect(url_for('showCatalog', catalog_id=catalog_id))
-    else:
-        flash('Catalog Item \'%s\' NOT Deleted' % itemToDelete.name)
+    if request.method == 'GET':
+        # print "getting something"
+        # flash('Catalog Item \'%s\' NOT Deleted' % itemToDelete.name)
+        # return redirect(url_for('showCatalog', catalog_id=catalog_id))
         return render_template('deleteCatalogItem.html', item=itemToDelete)
 
 
