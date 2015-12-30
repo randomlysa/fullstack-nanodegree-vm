@@ -459,6 +459,11 @@ def editCatalog(catalog_id):
 
     editedCatalog = session.query(
         Catalog).filter_by(id=catalog_id).one()
+        
+    # check if the user logged in is the catalog owner
+    if editedCatalog.user_id != login_session['user_id']:
+        return redirect('/error')
+        
     # two lines for debugging
     print editedCatalog.user_id
     print login_session['user_id']
@@ -600,6 +605,11 @@ def editCatalogItem(catalog_id, item_id):
         return redirect('/login')
     editedItem = session.query(CatalogItem).filter_by(id=item_id).one()
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
+    
+    # check if the user logged in is the item owner
+    if editedItem.user_id != login_session['user_id']:
+        return redirect('/error')
+        
     if request.method == 'POST':
         # check if an image was uploaded
         file = request.files['file']
@@ -645,6 +655,10 @@ def deleteCatalogItem(catalog_id, item_id):
         return redirect('/login')
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     itemToDelete = session.query(CatalogItem).filter_by(id=item_id).one()
+    
+    # check if the user logged in is the item owner
+    if itemToDelete.user_id != login_session['user_id']:
+        return redirect('/error')
     
     if request.method == 'POST':
         # check if there is an image to delete
