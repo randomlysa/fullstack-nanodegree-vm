@@ -503,7 +503,9 @@ def deleteCatalog(catalog_id):
 
     catalogToDelete = session.query(
         Catalog).filter_by(id=catalog_id).one()
-
+    # check if the user logged in is the catalog owner
+    if catalogToDelete.user_id != login_session['user_id']:
+        return redirect('/error')
 
     # items associated with the catalog, to be deleted
     catalogItemsToDelete = session.query(CatalogItem).filter_by(catalog_id=catalogToDelete.id)
