@@ -277,7 +277,7 @@ def allCatalogsJSON():
     return jsonify(catalogs=[r.serialize for r in catalogs])
 
 
-@app.route('/catalog/<int:catalog_id>/catalog/JSON')
+@app.route('/catalog/<int:catalog_id>/JSON')
 def oneCatalogJSON(catalog_id):
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     items = session.query(CatalogItem).filter_by(
@@ -285,7 +285,7 @@ def oneCatalogJSON(catalog_id):
     return jsonify(CatalogItems=[i.serialize for i in items])
 
 
-@app.route('/catalog/<int:catalog_id>/catalog/<int:item_id>/JSON')
+@app.route('/catalog/<int:catalog_id>/item/<int:item_id>/JSON')
 def menuItemJSON(catalog_id, item_id):
     Catalog_Item = session.query(CatalogItem).filter_by(id=item_id).one()
     return jsonify(Catalog_Item=Catalog_Item.serialize)
@@ -389,15 +389,18 @@ def show_file(id, type):
 @app.route('/')
 @app.route('/catalog/')
 def showCatalogs():
-    catalogs = session.query(Catalog).order_by(asc(Catalog.name))
-    users = session.query(User).order_by(asc(User.name))
-
+    catalogs = session.query(Catalog).order_by(Catalog.user_id.asc())
+    users = session.query(User).order_by(User.name.asc())
+    
     if 'username' not in login_session:
         return render_template(
-                        'publicCatalogs.html', catalogs=catalogs, users=users
+            'publicCatalogs.html', catalogs=catalogs, users=users
         )
     else:
-        return render_template('privateCatalogs.html', catalogs=catalogs)
+        user = getUserInfo(login_session['user_id'])
+        return render_template(
+            'privateCatalogs.html', catalogs=catalogs, currentUser=user
+        )
 
 
 # Create a new catalog
@@ -529,7 +532,7 @@ def deleteCatalog(catalog_id):
 
 # Show a catalog
 @app.route('/catalog/<int:catalog_id>/')
-@app.route('/catalog/<int:catalog_id>/catalog/')
+# @app.route('/catalog/<int:catalog_id>/catalog/')
 def showCatalog(catalog_id):
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     creator = getUserInfo(catalog.user_id)
@@ -548,7 +551,7 @@ def showCatalog(catalog_id):
 
 
 # Create a new catalog item
-@app.route('/catalog/<int:catalog_id>/catalog/new/', methods=['GET', 'POST'])
+@app.route('/catalog/<int:catalog_id>/item/new/', methods=['GET', 'POST'])
 def newCatalogItem(catalog_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -597,7 +600,7 @@ def newCatalogItem(catalog_id):
 
 # Edit a catalog item
 @app.route(
-        '/catalog/<int:catalog_id>/catalog/<int:item_id>/edit',
+        '/catalog/<int:catalog_id>/item/<int:item_id>/edit',
         methods=['GET', 'POST']
 )
 def editCatalogItem(catalog_id, item_id):
@@ -647,7 +650,7 @@ def editCatalogItem(catalog_id, item_id):
 
 # Delete a catalog item
 @app.route(
-        '/catalog/<int:catalog_id>/catalog/<int:item_id>/delete',
+        '/catalog/<int:catalog_id>/item/<int:item_id>/delete',
         methods=['GET', 'POST']
 )
 def deleteCatalogItem(catalog_id, item_id):
