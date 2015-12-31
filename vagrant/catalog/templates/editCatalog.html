@@ -3,6 +3,16 @@
 {% include "header.html" %}
 	<!-- color picker from jscolor.com -->
 	<script src="{{ url_for('static', filename='jscolor.min.js') }}"></script>
+	<script>
+		$( document ).ready( function() {
+			$( ".jscolor" ).change( function() {
+				var setColor = $(".jscolor").val();
+				// alert ( setColor );
+				$ ( 'h1' ).css('color', '#' + setColor);
+			});
+		});
+	
+	</script>
 	<div class="row banner menu">
 		<div class="row banner menu img-rounded" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header') }}')">
 			<h1>Edit {{catalog.name}}</h1>
@@ -13,13 +23,13 @@
 		
 			<form action="#" method = "post" enctype="multipart/form-data" >
 				<div class="form-group">
-					<h3><label for="name">Rename the catalog:</label></h3>
+					<h3 ><label for="name">Rename the catalog:</label></h3>
 					<input type="text" class="form-control" name="name" value="{{catalog.name }}">
 				</div>
 				
 				<div class="form-group">
 					<h3><label for="header-color">Change header color:</label></h3>
-					<input class="jscolor" name="header_color" maxlength="6" value="{{catalog.header_color}}">
+					<input class="jscolor" type="text" name="header_color" maxlength="6" value="{{catalog.header_color}}">
 				</div>
 				
 				<div class="form-group">
