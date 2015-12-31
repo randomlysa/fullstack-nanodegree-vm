@@ -230,8 +230,11 @@ def gconnect():
 
 # User Helper Functions
 def createUser(login_session):
-    newUser = User(name=login_session['username'], email=login_session[
-                   'email'], picture=login_session['picture'])
+    newUser = User(
+                name=login_session['username'],
+                email=login_session['email'],
+                picture=login_session['picture']
+    )
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
@@ -282,8 +285,8 @@ def allCatalogsJSON():
 @app.route('/catalog/<int:catalog_id>/JSON')
 def oneCatalogJSON(catalog_id):
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
-    items = session.query(CatalogItem).filter_by(
-        catalog_id=catalog_id).all()
+    items = session.query(CatalogItem).\
+        filter_by(catalog_id=catalog_id).all()
     return jsonify(CatalogItems=[i.serialize for i in items])
 
 
@@ -506,12 +509,11 @@ def showCatalog(catalog_id):
     creator = getUserInfo(catalog.user_id)
     items = session.query(CatalogItem).filter_by(
         catalog_id=catalog_id).all()
-    if 'username' not in login_session or \
-        creator.id != login_session['user_id']:
-            return render_template(
-                            'publicCatalog.html', items=items,
-                            catalog=catalog, creator=creator
-            )
+    if 'username' not in login_session or creator.id != login_session['user_id']:
+        return render_template(
+                        'publicCatalog.html', items=items,
+                        catalog=catalog, creator=creator
+        )
     else:
         return render_template(
                         'privateCatalog.html', items=items,
@@ -530,17 +532,18 @@ def newCatalogItem(catalog_id):
         # check if an image was uploaded
         file = request.files['file']
         if file and allowed_file(file.filename):
-            print "in the upload app for newCatalogItem"
-            print file.filename
+            # print "in the upload app for newCatalogItem"
+            # print file.filename
             extension = file.filename.rsplit('.', 1)[1]
             filename = secure_filename(file.filename)
-            lastId = session.query(CatalogItem).order_by\
-                (CatalogItem.id.desc()).first()
+            lastId = session.query(CatalogItem).\
+                order_by(CatalogItem.id.desc()).first()
             # for the first item in the database, lastId will not have an .id
             try:
                 nextId = lastId.id + 1
             except AttributeError:
                 nextId = 1
+
             filename = "user" + str(login_session['user_id']) + "_catalog" + \
                 str(catalog_id) + "_item" + str(nextId) + "." + extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
