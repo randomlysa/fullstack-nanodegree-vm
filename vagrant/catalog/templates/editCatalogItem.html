@@ -23,25 +23,47 @@
 					{# if canceling, return the user to the catalog he was previously in #}
 					<a href='{{url_for('showCatalog', catalog_id = catalog_id)}}'>
 						<button type="button" class="btn btn-default delete">
-							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel - showcatalog
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel
 						</button>
 					</a>
 					-->
-				</div>			
-					
+				</div>
+
 				<hr />
-				{# upload an image for the catalog item #}
-				<h3><label for="upload">Upload an image:</label></h3>
-				<input class="btn btn-default" type='file' name='file'>
-					<button type="submit" class="btn btn-default" id="submit" type="submit">
-						<span class="glyphicon glyphicon-upload" aria-hidden="true"></span>Submit Changes
-					</button>
-			
-				<a href='{{url_for('showCatalog', catalog_id = catalog_id)}}'>
-					<button type="button" class="btn btn-default delete">
-						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel - showcatalog
-					</button>
-				</a>
+				{% if item.image %}
+					<h3><label for="upload">Upload an image to replace the current image:</label></h3>
+						<img src="{{ url_for('show_file', id = item.id, type = 'item') }}" 
+								class="img-responsive img-rounded" >
+					
+					
+					<input class="btn btn-default btn-lg btn-block" type="file" name="file">
+						<button type="submit" class="btn btn-default btn-block" id="submit" type="submit">
+							<span class="glyphicon glyphicon-upload" aria-hidden="true"></span>Submit Changes
+						</button>
+				
+					<a href='{{url_for('showCatalog', catalog_id = catalog_id)}}'>
+						<button type="button" class="btn btn-default btn-block delete">
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel
+						</button>
+					</a>
+				{% endif %}
+				{% if not item.image %}
+					<h3><label for="upload">Upload an image for this item:</label></h3>
+					
+					<input class="btn btn-default btn-lg btn-block" type="file" name="file">
+						<button type="submit" class="btn btn-default btn-block" id="submit" type="submit">
+							<span class="glyphicon glyphicon-upload" aria-hidden="true"></span>Submit Changes
+						</button>
+				
+					<a href='{{url_for('showCatalog', catalog_id = catalog_id)}}'>
+						<button type="button" class="btn btn-default btn-block delete">
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel
+						</button>
+					</a>
+				{% endif %}
+				
+
+
 			</form>
 			{# end upload an image #}
 		</div>
