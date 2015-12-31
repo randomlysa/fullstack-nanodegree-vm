@@ -12,7 +12,12 @@
 			<form action="#" method = "post" enctype="multipart/form-data" >
 				<div class="form-group">
 					<h3><label for="name">Rename the catalog:</label></h3>
-					<input type ="text" class="form-control" name="name" value="{{catalog.name }}">
+					<input type="text" class="form-control" name="name" value="{{catalog.name }}">
+				</div>
+				
+				<div class="form-group">
+					<h3><label for="header-color">Change header color:</label></h3>
+					<input type="text" class="form-control" name="header_color" maxlength="6" value="{{catalog.header_color}}">
 				</div>
 				
 				<div class="form-group">

@@ -4,7 +4,7 @@
 	publicCatalog
 	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header') }}')">
 		<div>
-			<h1>{{ catalog.name }}			
+			<h1 {% if catalog.header_color %}style="color: #{{catalog.header_color}};"{% endif %}>{{ catalog.name }}
 				<figure class="creator">
 					<img src="{{ creator.picture}}"><br />
 					<figcaption>{{ creator.name }}</figcaption>

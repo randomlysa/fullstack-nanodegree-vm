@@ -471,11 +471,13 @@ def editCatalog(catalog_id):
     print editedCatalog.user_id
     print login_session['user_id']
 
-    if editedCatalog.user_id != login_session['user_id']:
+    '''
+      if editedCatalog.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert('You are not \
                     authorized to edit this catalog. Please create your\
                     own!');}</script><body onload='myFunction()'>"
-
+      '''
+                    
     if request.method == 'POST':
         # check if an image was uploaded
         file = request.files['file']
@@ -495,10 +497,18 @@ def editCatalog(catalog_id):
             editedCatalog.header_image = newFilename
         # end of upload section
         
+        # check if header color was changed
+        if request.form['header_color']:
+            print "new header color"
+            editedCatalog.header_color = request.form['header_color']
+        
+        # check if the catalog was renamed
         if request.form['name']:
             editedCatalog.name = request.form['name']
-            flash('Catalog Successfully Edited %s' % editedCatalog.name)
-            return redirect(url_for('showCatalogs'))
+        
+        session.commit()        
+        flash('Catalog Successfully Edited %s' % editedCatalog.name)
+        return redirect(url_for('showCatalogs'))
     else:
         return render_template('editCatalog.html', catalog=editedCatalog)
 
