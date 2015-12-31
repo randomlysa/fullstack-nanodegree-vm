@@ -42,6 +42,7 @@ session = DBSession()
 def error():
     return render_template('error.html')
 
+
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
@@ -86,7 +87,8 @@ def fbconnect():
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
 
-    # The token must be stored in the login_session in order to properly logout,
+    # The token must be stored in the login_session
+    # in order to properly logout,
     # let's strip out the information before the equals sign in our token
     stored_token = token.split("=")[1]
     login_session['access_token'] = stored_token
@@ -295,13 +297,15 @@ def menuItemJSON(catalog_id, item_id):
 '''
     problems:
         (edit) when a new image is uploaded, the old one is not deleted
-        (edit or new) files are all stores in the same directory with the original filename
-            if the same image is used for two items, and one item is delete, the image will be
-            deleted for the other item
+        (edit or new) files are all stores in the same
+        directory with the original filename
+            if the same image is used for two items, and one item is delete,
+            the image will be deleted for the other item
     possible solution - rename images:
         for catalog header: %user%_header_%catalogid% (since id is unique)
         for catalog items: %user%_%catalogid%_item_%itemid%
-        - will not have to delete old image when editing since the new image will have the same 
+        - will not have to delete old image when editing
+            since the new image will have the same
             name as the old image and overwrite it
         - each image will have a unique name
 '''
@@ -363,6 +367,7 @@ def upload(id, type):
                 print "nothing to upload!"
 '''
 
+
 @app.route('/uploads/<int:id>/<type>/')
 # def show_file(filename):
 def show_file(id, type):
@@ -372,14 +377,14 @@ def show_file(id, type):
         try:
             filename = catalog.header_image
             return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-        except:            
+        except:
             return "file does not exist"
 
     if type == 'item':
-        print "type = item"
+        # print "type = item"
         item = session.query(CatalogItem).filter_by(id=id).one()
         filename = item.image
-        print "filename" + filename
+        # print "filename" + filename
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     else:
         print "there is a problem"
@@ -391,7 +396,7 @@ def show_file(id, type):
 def showCatalogs():
     catalogs = session.query(Catalog).order_by(Catalog.user_id.asc())
     users = session.query(User).order_by(User.name.asc())
-    
+
     if 'username' not in login_session:
         return render_template(
             'publicCatalogs.html', catalogs=catalogs, users=users
@@ -420,12 +425,13 @@ def newCatalog():
         )
 
         session.add(newCatalog)
-        
+
         # get id of catalog that was created
         # this is probably not the best way to do this...
-        lastCatalog = session.query(Catalog).order_by(Catalog.id.desc()).first()
+        lastCatalog = session.query(Catalog).\
+            order_by(Catalog.id.desc()).first()
         catalog_id = lastCatalog.id
-        
+
         # check if an image was uploaded
         file = request.files['file']
         if file and allowed_file(file.filename):
@@ -436,13 +442,13 @@ def newCatalog():
             filename = secure_filename(file.filename)
 
             # renamed filename user#_catalog#_header.(extension)
-            newFilename = "user" + str(login_session['user_id']) + "_catalog" + \
-                str(catalog_id) + "_header" "." + extension
+            newFilename = "user" + str(login_session['user_id']) \
+                + "_catalog" + str(catalog_id) + "_header" "." + extension
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
             # make sure to update the renamed filename in the database
             lastCatalog.header_image = newFilename
-            
+
             session.add(lastCatalog)
             session.commit()
         # end of upload section
@@ -462,11 +468,11 @@ def editCatalog(catalog_id):
 
     editedCatalog = session.query(
         Catalog).filter_by(id=catalog_id).one()
-        
+
     # check if the user logged in is the catalog owner
     if editedCatalog.user_id != login_session['user_id']:
         return redirect('/error')
-        
+
     # two lines for debugging
     print editedCatalog.user_id
     print login_session['user_id']
@@ -477,7 +483,7 @@ def editCatalog(catalog_id):
                     authorized to edit this catalog. Please create your\
                     own!');}</script><body onload='myFunction()'>"
       '''
-                    
+
     if request.method == 'POST':
         # check if an image was uploaded
         file = request.files['file']
@@ -489,24 +495,24 @@ def editCatalog(catalog_id):
             filename = secure_filename(file.filename)
 
             # renamed filename user#_catalog#_header.(extension)
-            newFilename = "user" + str(login_session['user_id']) + "_catalog" + \
-                str(catalog_id) + "_header" "." + extension
+            newFilename = "user" + str(login_session['user_id']) \
+                + "_catalog" + str(catalog_id) + "_header" "." + extension
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
             # make sure to update the renamed filename in the database
             editedCatalog.header_image = newFilename
         # end of upload section
-        
+
         # check if header color was changed
         if request.form['header_color']:
             print "new header color"
             editedCatalog.header_color = request.form['header_color']
-        
+
         # check if the catalog was renamed
         if request.form['name']:
             editedCatalog.name = request.form['name']
-        
-        session.commit()        
+
+        session.commit()
         flash('Catalog Successfully Edited %s' % editedCatalog.name)
         return redirect(url_for('showCatalogs'))
     else:
@@ -526,9 +532,10 @@ def deleteCatalog(catalog_id):
         return redirect('/error')
 
     # items associated with the catalog, to be deleted
-    catalogItemsToDelete = session.query(CatalogItem).filter_by(catalog_id=catalogToDelete.id)
+    catalogItemsToDelete = session.query(CatalogItem)\
+        .filter_by(catalog_id=catalogToDelete.id)
     if request.method == 'POST':
-        for deleteThis in catalogItemsToDelete:        
+        for deleteThis in catalogItemsToDelete:
             os.remove("/vagrant/catalog/uploads/photos/" + deleteThis.image)
             session.delete(deleteThis)
         session.delete(catalogToDelete)
@@ -548,11 +555,12 @@ def showCatalog(catalog_id):
     creator = getUserInfo(catalog.user_id)
     items = session.query(CatalogItem).filter_by(
         catalog_id=catalog_id).all()
-    if 'username' not in login_session or creator.id != login_session['user_id']:
-        return render_template(
-                        'publicCatalog.html', items=items,
-                        catalog=catalog, creator=creator
-        )
+    if 'username' not in login_session or \
+        creator.id != login_session['user_id']:
+            return render_template(
+                            'publicCatalog.html', items=items,
+                            catalog=catalog, creator=creator
+            )
     else:
         return render_template(
                         'privateCatalog.html', items=items,
@@ -575,7 +583,8 @@ def newCatalogItem(catalog_id):
             print file.filename
             extension = file.filename.rsplit('.', 1)[1]
             filename = secure_filename(file.filename)
-            lastId = session.query(CatalogItem).order_by(CatalogItem.id.desc()).first()
+            lastId = session.query(CatalogItem).order_by\
+                (CatalogItem.id.desc()).first()
             # for the first item in the database, lastId will not have an .id
             try:
                 nextId = lastId.id + 1
@@ -596,7 +605,7 @@ def newCatalogItem(catalog_id):
         else:
             newItem = CatalogItem(
                         name=request.form['name'],
-                        description=request.form['description'],                        
+                        description=request.form['description'],
                         catalog_id=catalog_id, user_id=catalog.user_id
             )
         session.add(newItem)
@@ -618,11 +627,11 @@ def editCatalogItem(catalog_id, item_id):
         return redirect('/login')
     editedItem = session.query(CatalogItem).filter_by(id=item_id).one()
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
-    
+
     # check if the user logged in is the item owner
     if editedItem.user_id != login_session['user_id']:
         return redirect('/error')
-        
+
     if request.method == 'POST':
         # check if an image was uploaded
         file = request.files['file']
@@ -634,8 +643,9 @@ def editCatalogItem(catalog_id, item_id):
             filename = secure_filename(file.filename)
 
             # renamed filename user#_catalog#_item#.(extension)
-            newFilename = "user" + str(login_session['user_id']) + "_catalog" + \
-                str(catalog_id) + "_item" + str(item_id) + "." + extension
+            newFilename = "user" + str(login_session['user_id']) \
+                + "_catalog" + str(catalog_id) + "_item" + str(item_id) \
+                + "." + extension
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
             # make sure to update the renamed filename in the database
@@ -646,7 +656,7 @@ def editCatalogItem(catalog_id, item_id):
         if request.form['name']:
             editedItem.name = request.form['name']
         if request.form['description']:
-            editedItem.description = request.form['description']        
+            editedItem.description = request.form['description']
         session.add(editedItem)
         session.commit()
         flash('Catalog Item Successfully Edited')
@@ -668,11 +678,11 @@ def deleteCatalogItem(catalog_id, item_id):
         return redirect('/login')
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     itemToDelete = session.query(CatalogItem).filter_by(id=item_id).one()
-    
+
     # check if the user logged in is the item owner
     if itemToDelete.user_id != login_session['user_id']:
         return redirect('/error')
-    
+
     if request.method == 'POST':
         # check if there is an image to delete
         print "in the post"
