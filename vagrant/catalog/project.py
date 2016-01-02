@@ -49,23 +49,30 @@ def error():
 def makeThumbnail(path, imageExtension):
     try:
         # os.path.join(app.config['UPLOAD_FOLDER'], newFilename)
-        im = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], imageExtension))
+        original = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], imageExtension))
     except:
         print "image doesn't exist"
 
     # split name from extension
     imageName = imageExtension.rsplit('.', 1)[0]
 
-    width, height = im.size
+    width, height = original.size # ex 800x600
     ratio = float(height) / width # ex: 0.75
     newWidth = 350
-    newHeight = width * ratio # 262.5 = 350 * 0.75 
+    newHeight = width * ratio # 262.5 = 350 * 0.75
     size = (newWidth, newHeight)
+    original.thumbnail(size)
 
-    im.thumbnail(size)
-    newTnName = imageName + "-tn.jpg"
-    im.save(os.path.join(app.config['UPLOAD_FOLDER'], newTnName))
-    # im.save(file + "-tn.", "jpg")
+    if newHeight > 231:
+        # image is portrait orientation. crop the height 231 
+        print "cropping" + imageName
+        crop = original.crop((0,0,350,231))
+        newTnName = imageName + "-tn.jpg"
+        crop.save(os.path.join(app.config['UPLOAD_FOLDER'], newTnName))
+    else:
+        newTnName = imageName + "-tn.jpg"
+        original.save(os.path.join(app.config['UPLOAD_FOLDER'], newTnName))
+        # im.save(file + "-tn.", "jpg")
     return newTnName
 
 # Create anti-forgery state token
