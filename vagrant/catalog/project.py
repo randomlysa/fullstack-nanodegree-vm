@@ -46,28 +46,24 @@ session = DBSession()
 def error():
     return render_template('error.html')
 
-def makeThumbnail(path, image):
+def makeThumbnail(path, imageExtension):
     try:
         # os.path.join(app.config['UPLOAD_FOLDER'], newFilename)
-        im = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], image))
+        im = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], imageExtension))
     except:
         print "image doesn't exist"
 
-    # width = im.width
-    # height = im.height # ex: 600
-    print "sizessssssssssssssss"
+    # split name from extension
+    imageName = imageExtension.rsplit('.', 1)[0]
+
     width, height = im.size
-    print width
-    print height
     ratio = float(height) / width # ex: 0.75
     newWidth = 350
     newHeight = width * ratio # 262.5 = 350 * 0.75 
-    print ratio
-    
     size = (newWidth, newHeight)
 
     im.thumbnail(size)
-    newName = image + "-tn.png"
+    newName = imageName + "-tn.jpg"
     im.save(os.path.join(app.config['UPLOAD_FOLDER'], newName))
     # im.save(file + "-tn.", "jpg")
 
