@@ -63,9 +63,10 @@ def makeThumbnail(path, imageExtension):
     size = (newWidth, newHeight)
 
     im.thumbnail(size)
-    newName = imageName + "-tn.jpg"
-    im.save(os.path.join(app.config['UPLOAD_FOLDER'], newName))
+    newTnName = imageName + "-tn.jpg"
+    im.save(os.path.join(app.config['UPLOAD_FOLDER'], newTnName))
     # im.save(file + "-tn.", "jpg")
+    return newTnName
 
 # Create anti-forgery state token
 @app.route('/login')
@@ -424,10 +425,11 @@ def newCatalog():
                 + "_catalog" + str(catalog_id) + "_header" "." + extension
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
+            # makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
             # make sure to update the renamed filename in the database
             lastCatalog.header_image = newFilename
-
-            makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
+            lastCatalog.header_image_tn = \
+                makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
 
             session.add(lastCatalog)
             session.commit()
@@ -482,9 +484,10 @@ def editCatalog(catalog_id):
 
             # make sure to update the renamed filename in the database
             editedCatalog.header_image = newFilename
+            editedCatalog.header_image_tn = \
+                makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
 
         # end of upload section
-            makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
 
         # check if header color was changed
         if request.form['header_color']:
@@ -577,12 +580,13 @@ def newCatalogItem(catalog_id):
                 str(catalog_id) + "_item" + str(nextId) + "." + extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-            makeThumbnail(app.config['UPLOAD_FOLDER'], filename)
+            item_image_tn = makeThumbnail(app.config['UPLOAD_FOLDER'], filename)
 
             newItem = CatalogItem(
                         name=request.form['name'],
                         description=request.form['description'],
                         item_image=filename,
+                        item_image_tn=item_image_tn,
                         catalog_id=catalog_id, 
                         user_id=catalog.user_id
             )
@@ -635,9 +639,10 @@ def editCatalogItem(catalog_id, item_id):
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
             
-            makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
             # make sure to update the renamed filename in the database
             editedItem.item_image = newFilename
+            editedItem.item_image_tn = \
+                makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
 
         # end of upload section
 
