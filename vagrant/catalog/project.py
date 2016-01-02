@@ -443,7 +443,9 @@ def newCatalog():
 
         flash('New Catalog %s Successfully Created' % newCatalog.name)
         session.commit()
-        return redirect(url_for('showCatalogs'))
+        # return redirect(url_for('showCatalogs'))
+        # send the user to the catalog that was just made
+        return redirect(url_for('showCatalog', catalog_id = lastCatalog.id))
     else:
         return render_template('newCatalog.html')
 
