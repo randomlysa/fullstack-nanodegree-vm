@@ -361,7 +361,7 @@ def show_file(id, type):
     if type == 'item':
         # print "type = item"
         item = session.query(CatalogItem).filter_by(id=id).one()
-        filename = item.image
+        filename = item_image.image
         # print "filename" + filename
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     else:
@@ -517,7 +517,7 @@ def deleteCatalog(catalog_id):
         .filter_by(catalog_id=catalogToDelete.id)
     if request.method == 'POST':
         for deleteThis in catalogItemsToDelete:
-            os.remove("/vagrant/catalog/uploads/photos/" + deleteThis.image)
+            os.remove("/vagrant/catalog/uploads/photos/" + deleteThis.item_image)
             session.delete(deleteThis)
         session.delete(catalogToDelete)
         flash('Catalog \'%s\' Successfully Deleted' % catalogToDelete.name)
@@ -630,7 +630,7 @@ def editCatalogItem(catalog_id, item_id):
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
             # make sure to update the renamed filename in the database
-            editedItem.image = newFilename
+            editedItem.item_image = newFilename
 
         # end of upload section
 
@@ -667,9 +667,9 @@ def deleteCatalogItem(catalog_id, item_id):
     if request.method == 'POST':
         # check if there is an image to delete
         print "in the post"
-        if itemToDelete.image:
+        if itemToDelete.item_image:
             print "image to delete: " + itemToDelete.image
-            os.remove("/vagrant/catalog/uploads/photos/" + itemToDelete.image)
+            os.remove("/vagrant/catalog/uploads/photos/" + itemToDelete.item_image)
         # end delete image
         session.delete(itemToDelete)
         session.commit()
