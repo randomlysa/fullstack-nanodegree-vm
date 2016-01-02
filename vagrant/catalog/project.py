@@ -609,10 +609,10 @@ def newCatalogItem(catalog_id):
         session.add(newItem)
         session.commit()
 
-        flash('New Item %s Successfully Created' % (newItem.name))
+        flash('New Item \'%s\' Successfully Created' % (newItem.name))
         return redirect(url_for('showCatalog', catalog_id=catalog_id))
     else:
-        return render_template('newCatalogItem.html', catalog_id=catalog_id)
+        return render_template('newCatalogItem.html', catalog_id=catalog_id, catalog_name = catalog.name)
 
 
 # Edit a catalog item

@@ -3,7 +3,7 @@
 {% include "header.html" %}	
 	<div class="row banner menu">
 		<div class="row banner menu img-rounded" style="background-image: url('{{ url_for('show_file', id = catalog_id, type = 'header_image') }}')">
-			<h1>New Catalog Item</h1>
+			<h1>New Catalog Item For: {{catalog_name}}</h1>
 		</div>
 	</div>
 	<div class="row">
