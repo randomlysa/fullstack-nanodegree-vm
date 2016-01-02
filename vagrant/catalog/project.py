@@ -10,6 +10,10 @@ from flask import session as login_session
 import random
 import string
 
+# to make thumbnails
+from PIL import Image
+import glob
+
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
@@ -42,6 +46,30 @@ session = DBSession()
 def error():
     return render_template('error.html')
 
+def makeThumbnail(path, image):
+    try:
+        # os.path.join(app.config['UPLOAD_FOLDER'], newFilename)
+        im = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], image))
+    except:
+        print "image doesn't exist"
+
+    # width = im.width
+    # height = im.height # ex: 600
+    print "sizessssssssssssssss"
+    width, height = im.size
+    print width
+    print height
+    ratio = float(height) / width # ex: 0.75
+    newWidth = 350
+    newHeight = width * ratio # 262.5 = 350 * 0.75 
+    print ratio
+    
+    size = (newWidth, newHeight)
+
+    im.thumbnail(size)
+    newName = image + "-tn.png"
+    im.save(os.path.join(app.config['UPLOAD_FOLDER'], newName))
+    # im.save(file + "-tn.", "jpg")
 
 # Create anti-forgery state token
 @app.route('/login')
@@ -453,9 +481,12 @@ def editCatalog(catalog_id):
                 + "_catalog" + str(catalog_id) + "_header" "." + extension
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
+
             # make sure to update the renamed filename in the database
             editedCatalog.header_image = newFilename
+
         # end of upload section
+            makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
 
         # check if header color was changed
         if request.form['header_color']:
