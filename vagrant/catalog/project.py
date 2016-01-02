@@ -513,6 +513,11 @@ def editCatalog(catalog_id):
         if request.form['name']:
             editedCatalog.name = request.form['name']
 
+        # update catalog_image_type 
+        if request.form['catalog_image_type']:
+            editedCatalog.catalog_image_type = \
+                request.form['catalog_image_type']
+
         session.commit()
         flash('Catalog \'%s\' Successfully Edited' % editedCatalog.name)
         # return user to the catalog they edited

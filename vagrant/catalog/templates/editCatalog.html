@@ -33,6 +33,13 @@
 				</div>
 				
 				<div class="form-group">
+					<h3><label for="use-thumnail">Use cropped thumbnail or resized original:</h3>
+					<input type="radio" name="catalog_image_type" value="item_image_tn">
+						Keep all images the same size - used cropped portrait thumbnail <br />
+					<input type="radio" name="catalog_image_type" value="item_image">
+						Use resized original image - portrait images will be taller than landscape
+				
+				<div class="form-group">
 					<h3><label for="upload">Upload a header image:</label></h3>
 					{# browse button #}
 					<input class="btn btn-lg btn-block" type='file' name='file'>

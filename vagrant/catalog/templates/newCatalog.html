@@ -15,6 +15,19 @@
 				</div>
 				
 				<div class="form-group">
+					<h3><label for="header-color">Change header color:</label></h3>
+					<input class="jscolor" type="text" name="header_color" maxlength="6" value="">
+				</div>
+				
+				<div class="form-group">
+					<h3><label for="use-thumnail">Use cropped thumbnail or resized original:</h3>
+					<input type="radio" name="catalog_image_type" value="item_image_tn" checked>
+						Keep all images the same size - used cropped portrait thumbnail <br />
+					<input type="radio" name="catalog_image_type" value="item_image">
+						Use resized original image - portrait images will be taller than landscape
+				</form>
+				
+				<div class="form-group">
 					<h3><label for="upload">Upload a header image:</label></h3>
 					{# browse button #}
 					<input class="btn btn-lg btn-block" type='file' name='file'>
@@ -22,6 +35,12 @@
 					<button type="submit" class="btn btn-default btn-block" id="submit" type="submit">
 						<span class="glyphicon glyphicon-upload" aria-hidden="true"></span>Submit Changes
 					</button>
+					{# cancel #}
+					<a href='{{ url_for('showCatalogs') }}'>
+						<button type="button" class="btn btn-default btn-block delete">
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Cancel
+						</button>
+					</a>
 				</div>
 			</form>
 		</div>

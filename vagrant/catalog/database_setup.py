@@ -21,6 +21,7 @@ class Catalog(Base):
     header_image = Column(String(250))
     header_image_tn = Column(String(250))
     header_color = Column(String(8))
+    catalog_image_type = Column(String(25))
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
