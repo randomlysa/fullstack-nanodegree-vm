@@ -4,11 +4,11 @@
 	privateCatalogs
 	<div class="row banner main">		
 		<div class="col-md-12">
-			<h1>Catalogs</h1>
+			<h1>Catalogs</h1>			
 		</div>		
 	</div>
 
-	<div class="row banner">
+	<div class="row">
 	{% with messages = get_flashed_messages() %}
 		{% if messages %}          
 			<ul class="flash">
@@ -20,16 +20,14 @@
 	{% endwith %}
 	</div>
 	
-	<div class="row padding-top padding-bottom">
-		<div class="col-md-1"></div>
-		<div class="col-md-10 padding-none">
+	<div class="row padding-top padding-bottom">		
+		<div class="col-md-12 text-center">
 			<a href="{{url_for('newCatalog')}}">
-				<button type="button" class="btn btn-default" id="new-catalog">
+				<button type="button" class="btn btn-lg" id="new-catalog">
 					<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add Catalog
 				</button>
 			</a>
 		</div>
-		<div class="col-md-1"></div>
 	</div>
 
 	<div id="grid" data-columns>
