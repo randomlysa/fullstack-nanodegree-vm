@@ -515,7 +515,9 @@ def editCatalog(catalog_id):
 
         session.commit()
         flash('Catalog \'%s\' Successfully Edited' % editedCatalog.name)
-        return redirect(url_for('showCatalogs'))
+        # return user to the catalog they edited
+        return redirect(url_for('showCatalog', catalog_id=editedCatalog.id))
+        # return redirect(url_for('showCatalogs'))
     else:
         return render_template('editCatalog.html', catalog=editedCatalog)
 
@@ -668,6 +670,7 @@ def editCatalogItem(catalog_id, item_id):
         session.add(editedItem)
         session.commit()
         flash('Catalog Item \'%s\' Successfully Edited' % editedItem.name)
+        # return user to the catalog that they edited
         return redirect(url_for('showCatalog', catalog_id=catalog_id))
     else:
         return render_template(
