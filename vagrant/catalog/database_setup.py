@@ -28,8 +28,10 @@ class Catalog(Base):
     def serialize(self):
        """Return object data in easily serializeable format"""
        return {
-           'name'         : self.name,
            'id'           : self.id,
+           'name'         : self.name,
+           'header_image'    : self.header_image,
+           'header_image_tn'    : self.header_image_tn,
        }
  
 class CatalogItem(Base):
@@ -51,10 +53,11 @@ class CatalogItem(Base):
     def serialize(self):
        """Return object data in easily serializeable format"""
        return {
+           'id'          : self.id,
            'name'         : self.name,
-           'description'         : self.description,
-           'id'         : self.id,
-           'image'         : self.image,           
+           'description'    : self.description,
+           'image'        : self.item_image,
+           'thumbnail'     : self.item_image_tn
        }
 
 
