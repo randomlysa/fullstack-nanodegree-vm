@@ -351,17 +351,23 @@ def allowed_file(filename):
 # def show_file(filename):
 def show_file(id, type):
     if type == 'header_image' or type == 'header_image_tn':
-        catalog = session.query(Catalog).filter_by(id=id).one()
+        catalog = session.query(Catalog).filter_by(id=id).one()        
         try:
-            filename = catalog.header_image
+            if type == 'header_image':
+                filename = catalog.header_image
+            if type == 'header_image_tn':
+                filename = catalog.header_image_tn
             return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
         except:
-            return "file does not exist" # use random file provided
+            return filename + " : file does not exist" # use random file provided
 
     if type == 'item_image' or type == 'item_image_tn':
         item = session.query(CatalogItem).filter_by(id=id).one()
         try:
-            filename = item.item_image        
+            if type == 'item_image':
+                filename = item.item_image
+            if type == 'item_image_tn':
+                filename = item.item_image_tn
             return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
         except:
             return "file does not exist" # use random file provided
