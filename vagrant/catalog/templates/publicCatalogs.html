@@ -31,31 +31,27 @@
         {% endif %}
     {% endwith %}
 
-</div>
-
-
-	
-	<div class="row padding-top padding-bottom">
-		<div class="col-md-1"></div>
-		<div class="col-md-10 padding-none">
-			
-		</div>
-		<div class="col-md-1"></div>
 	</div>
+
+	<div id="grid" data-columns>
 	{% for catalog in catalogs %}
-		<a href = "{{url_for('showCatalog', catalog_id = catalog.id)}}">
-			<div class="row">
-				<div class="col-md-1"></div>
-					<div class="col-md-10 catalog-list">
-						<h3>{{catalog.name}}</h3>
-					</div>
-				<div class="col-md-1"></div>
-			</div>
-		</a>
+		<div>
+		<a href="{{url_for('showCatalog', catalog_id = catalog.id)}}">
+			
+				<h3>{{catalog.name}}</h3>
+				{% if catalog.header_image_tn %}
+					<img src="{{ url_for('show_file', id = catalog.id, type = 'header_image_tn') }}" class="img-responsive img-rounded center-block">
+				{% endif %}
+			
+		</a>	
+		</div>
 	{% endfor %}
+	</div>
+	<br clear="all">
+	
 	<div class="row text-right">
 		<a href="#top">Back to top</a> | 
 		<a href="{{ url_for('allCatalogsJSON') }}">View page in JSON</a>
 	</div>
-	
+	<script src="{{ url_for('static', filename='salvattore.min.js.txt') }}"></script>	
 {% endblock %}

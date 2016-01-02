@@ -157,5 +157,47 @@ h3 {
 	text-align: center;
 }
 .container {
-	margin-bottom: 30px;
+	margin-bottom: 30px;	
+}
+
+
+@media screen and (max-width: 640px){
+	#grid[data-columns]::before {
+		content: '1 .column.size-1of1';
+	}
+}
+
+@media screen and (min-width: 641px) and (max-width: 1159px) {
+	#grid[data-columns]::before {
+		content: '2 .column.size-1of2';
+	}
+}
+@media screen and (min-width: 1160px) {
+	#grid[data-columns]::before {
+		content: '3 .column.size-1of3';
+	}
+}
+
+
+/* These are the classes that are going to be applied: */
+.column { 
+	float: left; 
+}
+
+.size-1of3 { 
+	text-align: center;
+	width: 33.333%;
+	padding: 25px;
+}
+
+.size-1of2 { 
+	text-align: center;
+	width: 49%;
+	padding: 25px;
+}
+
+.size-1of1 { 
+	text-align: center;
+	width: 99%;
+	padding: 25px;
 }
