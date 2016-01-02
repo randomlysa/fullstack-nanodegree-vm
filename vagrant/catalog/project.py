@@ -361,7 +361,7 @@ def show_file(id, type):
     if type == 'item':
         # print "type = item"
         item = session.query(CatalogItem).filter_by(id=id).one()
-        filename = item_image.image
+        filename = item.item_image
         # print "filename" + filename
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     else:
