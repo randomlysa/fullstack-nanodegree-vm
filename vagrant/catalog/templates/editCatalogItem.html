@@ -20,7 +20,7 @@
 				</div>
 
 				<hr />
-				{% if item.image %}
+				{% if item.item_image %}
 						<h3><label for="upload">Upload an image to replace the current image:</label></h3>
 						<img src="{{ url_for('show_file', id = item.id, type = 'item') }}" 	class="img-responsive img-rounded" >
 					
@@ -37,7 +37,7 @@
 						</a>
 					</div>
 				{% endif %}
-				{% if not item.image %}
+				{% if not item.item_image %}
 					<div class="form-group">
 						<h3><label for="upload">Upload an image for this item:</label></h3>
 						<input class="btn btn-lg btn-block" type="file" name="file">

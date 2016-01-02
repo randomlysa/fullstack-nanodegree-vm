@@ -680,7 +680,7 @@ def deleteCatalogItem(catalog_id, item_id):
         # check if there is an image to delete
         print "in the post"
         if itemToDelete.item_image:
-            print "image to delete: " + itemToDelete.image
+            print "image to delete: " + itemToDelete.item_image
             os.remove("/vagrant/catalog/uploads/photos/" + itemToDelete.item_image)
         # end delete image
         session.delete(itemToDelete)
