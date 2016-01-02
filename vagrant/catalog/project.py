@@ -441,7 +441,7 @@ def newCatalog():
             session.commit()
         # end of upload section
 
-        flash('New Catalog %s Successfully Created' % newCatalog.name)
+        flash('New Catalog \'%s\' Successfully Created' % newCatalog.name)
         session.commit()
         # return redirect(url_for('showCatalogs'))
         # send the user to the catalog that was just made
@@ -507,7 +507,7 @@ def editCatalog(catalog_id):
             editedCatalog.name = request.form['name']
 
         session.commit()
-        flash('Catalog Successfully Edited %s' % editedCatalog.name)
+        flash('Catalog \'%s\' Successfully Edited' % editedCatalog.name)
         return redirect(url_for('showCatalogs'))
     else:
         return render_template('editCatalog.html', catalog=editedCatalog)
@@ -660,7 +660,7 @@ def editCatalogItem(catalog_id, item_id):
             editedItem.description = request.form['description']
         session.add(editedItem)
         session.commit()
-        flash('Catalog Item Successfully Edited')
+        flash('Catalog Item \'%s\' Successfully Edited' % editedItem.name)
         return redirect(url_for('showCatalog', catalog_id=catalog_id))
     else:
         return render_template(
