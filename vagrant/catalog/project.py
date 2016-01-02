@@ -427,6 +427,8 @@ def newCatalog():
             # make sure to update the renamed filename in the database
             lastCatalog.header_image = newFilename
 
+            makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
+
             session.add(lastCatalog)
             session.commit()
         # end of upload section
@@ -575,11 +577,14 @@ def newCatalogItem(catalog_id):
                 str(catalog_id) + "_item" + str(nextId) + "." + extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
+            makeThumbnail(app.config['UPLOAD_FOLDER'], filename)
+
             newItem = CatalogItem(
                         name=request.form['name'],
                         description=request.form['description'],
-                        image=filename,
-                        catalog_id=catalog_id, user_id=catalog.user_id
+                        item_image=filename,
+                        catalog_id=catalog_id, 
+                        user_id=catalog.user_id
             )
         # end of image upload section
         # if no image was uploaded, newItem will not have a filename
@@ -629,6 +634,8 @@ def editCatalogItem(catalog_id, item_id):
                 + "." + extension
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
+            
+            makeThumbnail(app.config['UPLOAD_FOLDER'], newFilename)
             # make sure to update the renamed filename in the database
             editedItem.item_image = newFilename
 
