@@ -350,21 +350,21 @@ def allowed_file(filename):
 @app.route('/uploads/<int:id>/<type>/')
 # def show_file(filename):
 def show_file(id, type):
-    if type == 'header':
-        # print "type = header"
+    if type == 'header_image' or type == 'header_image_tn':
         catalog = session.query(Catalog).filter_by(id=id).one()
         try:
             filename = catalog.header_image
             return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
         except:
-            return "file does not exist"
+            return "file does not exist" # use random file provided
 
-    if type == 'item':
-        # print "type = item"
+    if type == 'item_image' or type == 'item_image_tn':
         item = session.query(CatalogItem).filter_by(id=id).one()
-        filename = item.item_image
-        # print "filename" + filename
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        try:
+            filename = item.item_image        
+            return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        except:
+            return "file does not exist" # use random file provided
     else:
         print "there is a problem"
 

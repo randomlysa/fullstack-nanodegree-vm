@@ -2,7 +2,7 @@
 {% block content %}
 {% include "header.html" %}
 	<div class="row banner menu img-rounded" >
-		<div class="row banner menu img-rounded" style="background-image: url('{{ url_for('show_file', id = catalog_id, type = 'header') }}')">
+		<div class="row banner menu img-rounded" style="background-image: url('{{ url_for('show_file', id = catalog_id, type = 'header', size = 'full') }}')">
 			<h1>Edit Catalog Item</h1>
 		</div>
 	</div>
@@ -22,7 +22,7 @@
 				<hr />
 				{% if item.item_image %}
 						<h3><label for="upload">Upload an image to replace the current image:</label></h3>
-						<img src="{{ url_for('show_file', id = item.id, type = 'item') }}" 	class="img-responsive img-rounded" >
+						<img src="{{ url_for('show_file', id = item.id, type = 'item', size = 'full') }}" 	class="img-responsive img-rounded" >
 					
 					<div class="form-group">
 						<input class="btn btn-lg btn-block" type="file" name="file">

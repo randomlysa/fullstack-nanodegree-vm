@@ -2,7 +2,7 @@
 {% block content %}
 {% include "header.html" %}
 	privateCatalog
-	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header') }}')">
+	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header_image') }}')">
 		<div>
 			<h1 {% if catalog.header_color %}style="color: #{{catalog.header_color}};"{% endif %}>{{ catalog.name }}
 				<figure class="creator">
@@ -81,7 +81,7 @@
 							</div>
 							<div class="col-md-6">
 							{% if i.item_image %}
-								<img src="{{ url_for('show_file', id = i.id, type = 'item') }}" 
+								<img src="{{ url_for('show_file', id = i.id, type = 'item_image') }}" 
 								class="img-responsive img-rounded" >
 							{% endif %}
 							</div>
