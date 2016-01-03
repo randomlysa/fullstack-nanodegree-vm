@@ -16,7 +16,7 @@
 	<div class="row padding-top padding-bottom">
 		<div class="col-md-1"></div>
 		<div class="col-md-11 padding-none">
-			
+
 		</div>
 		<div class="col-md-7"></div>
 	</div>
@@ -40,18 +40,26 @@
 			<h1>there are no items in this catalog (yet)!</h1>
 		</div>
 	{% endif %}
-	
-	
-	{% if items !=[] %}	
-		<div class="row">			
-				<h2>Items</h2>
-					{% for i in items %}
-						<div class="menu-item">
-							<div class="row">
-								<div class="col-md-6">
+
+
+	<h2>Items</h2>
+
+	{# begin show items #}
+	<div class="grid js-isotope"
+		data-isotope-options='{ "itemSelector": ".grid-item-catalog", "layoutMode": "masonry"}'>
+		{% if items !=[] %}
+				{% for i in items %}
+					{# select which class to use - thumbnails or full size images #}
+						{% if catalog.catalog_image_type == 'item_image_tn' %}
+							<div class="grid-item-catalog grid-item-catalog-tn">
+						{% endif %}
+						{% if catalog.catalog_image_type == 'item_image' %}
+							<div class="grid-item-catalog grid-item-catalog-img">
+						{% endif %}
+					{# end class select #}
 									<h3>
 										{{i.name}}
-									
+
 										<div class="btn-group">
 											<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 												<span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
@@ -61,22 +69,23 @@
 											</ul>
 										</div>
 									</h3>
-									
+
 									<p>{{i.description}}</p>
-								</div>
-								<div class="col-md-6">
+
 								{% if i.item_image %}
-									<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}" 
+									<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}"
 									class="img-responsive img-rounded" >
 								{% endif %}
-								</div>
-							</div>								
-						</div>
-					{% endfor %}
-		</div>
-	{% endif %}
+					</div>
+				{% endfor %}
+		{% endif %}
+	</div>
+	{# end show items #}
+
+
+
 	<div class="row text-right">
-		<a href="#top">Back to top</a> | 
+		<a href="#top">Back to top</a> |
 		<a href="{{ url_for('oneCatalogJSON', catalog_id = catalog.id) }}">View page in JSON</a>
 	</div>
 {% endblock %}

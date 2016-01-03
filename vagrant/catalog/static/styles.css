@@ -207,18 +207,18 @@ h3 {
 old style - delete if I like the new style */
 
 @media screen and (max-width: 640px){
-	.grid-item {
+	.grid-item-catalogs {
 		width: 99%;
 	}
 }
 
 @media screen and (min-width: 641px) and (max-width: 1159px) {
-	.grid-item {
+	.grid-item-catalogs {
 		width: 49%;
 	}
 }
 @media screen and (min-width: 1160px) {
-	.grid-item {
+	.grid-item-catalogs {
 		width: 33%;
 	}
 }
@@ -240,10 +240,22 @@ old style - delete if I like the new style */
     filter: alpha(opacity=70);
 }
 
+/* style for privateCatalog, publicCatalog */
 .grid-item-catalog {
-	width: 49%,
-	padding: 15px;
 	text-align: center;
-	position: relative;
-	margin-bottom: 15px
+	margin: 2px;
+	padding: 2px;
+}
+
+.grid-item-catalog-tn {
+	width: 33%;
+}
+
+.grid-item-catalog-img {
+	width: 99%;
+	margin-bottom: 25px;
+}
+
+.item-description {
+	height: 30px;
 }

@@ -15,7 +15,7 @@
 
 	<div class="row banner">
 	{% with messages = get_flashed_messages() %}
-		{% if messages %}          
+		{% if messages %}
 			<ul class="flash">
 				{% for message in messages %}
 					<li> <strong> {{ message }} </strong> </li>
@@ -25,9 +25,9 @@
 	{% endwith %}
 	</div>
 
-	
-	{# dropdown menu #}	
-		<button type="button" class="btn btn-xs dropdown-toggle" 
+
+	{# dropdown menu #}
+		<button type="button" class="btn btn-xs dropdown-toggle"
 			data-toggle="collapse" data-target="#ownerMenu" aria-haspopup="true" aria-expanded="false">
 			Show/Hide Owner Menu<span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
 		</button>
@@ -38,14 +38,14 @@
 					<button type="button" class="btn btn-lg">
 						<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add Catalog Item
 					</button>
-				</a>		
-						
+				</a>
+
 				<a href="{{url_for('editCatalog', catalog_id = catalog.id )}}">
-					<button type=button" class="btn btn-lg">
+					<button type="button" class="btn btn-lg">
 						<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>Edit Catalog
 					</button>
 				</a>
-				
+
 				<a href="{{url_for('deleteCatalog', catalog_id = catalog.id )}}">
 					<button type="button" class="btn btn-lg delete" id="delete-catalog">
 					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete Catalog
@@ -53,9 +53,7 @@
 				</a>
 			</div>
 		</div>
-	
-	<br clear="all">
-	
+
 	{# if there are no items, suggest the user makes one #}
 	{% if not items %}
 		<div style="width: 100%; height: 300px; text-align: center; padding: 50px;">
@@ -70,46 +68,53 @@
 			</a>
 		</div>
 	{% endif %}
-	
-	{% if items !=[] %}	
-		<div class="row">
-			<h2>Items</h2>
+
+	<h2>Items</h2>
+
+	{# begin show items #}
+	<div class="grid js-isotope"
+		data-isotope-options='{ "itemSelector": ".grid-item-catalog", "layoutMode": "masonry"}'>
+		{% if items !=[] %}
 				{% for i in items %}
-					<div class="menu-item">
-						<div class="row">
-							<div class="col-md-6">
-								<h3>
-									{{i.name}}
-								
-									<div class="btn-group">
-										<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-											<span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
-										</button>
-										<ul class="dropdown-menu">
-											<li><a href="{{url_for('menuItemJSON', catalog_id = catalog.id, item_id = i.id)}}">View JSON</a></li>
-											<li role="separator" class="divider"></li>
-											<li><a href='{{url_for('editCatalogItem', catalog_id = catalog.id, item_id=i.id ) }}'>Edit</a></li>
-											<li><a href='{{url_for('deleteCatalogItem', catalog_id = catalog.id, item_id=i.id ) }}'>Delete</a></li>
-										</ul>
-									</div>
-								</h3>
-								
-								<p>{{i.description}}</p>
-							</div>
-							<div class="col-md-6">
-							{% if i.item_image %}								
-								<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}" 
-								class="img-responsive img-rounded" >								
-							{% endif %}
-							</div>
-						</div>
+					{# select which class to use - thumbnails or full size images #}
+						{% if catalog.catalog_image_type == 'item_image_tn' %}
+							<div class="grid-item-catalog grid-item-catalog-tn">
+						{% endif %}
+						{% if catalog.catalog_image_type == 'item_image' %}
+							<div class="grid-item-catalog grid-item-catalog-img">
+						{% endif %}
+					{# end class select #}
+									<h3>
+										{{i.name}}
+
+										<div class="btn-group">
+											<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+												<span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+											</button>
+											<ul class="dropdown-menu">
+												<li><a href="{{url_for('menuItemJSON', catalog_id = catalog.id, item_id = i.id)}}">View JSON</a></li>
+												<li role="separator" class="divider"></li>
+												<li><a href='{{url_for('editCatalogItem', catalog_id = catalog.id, item_id=i.id ) }}'>Edit</a></li>
+												<li><a href='{{url_for('deleteCatalogItem', catalog_id = catalog.id, item_id=i.id ) }}'>Delete</a></li>
+											</ul>
+										</div>
+									</h3>
+
+									<p>{{i.description}}</p>
+
+								{% if i.item_image %}
+									<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}"
+									class="img-responsive img-rounded" >
+								{% endif %}
 					</div>
 				{% endfor %}
-		</div>
-	{% endif %}
-	<div class="row text-right">
-			<a href="#top">Back to top</a> | 
-			<a href="{{ url_for('oneCatalogJSON', catalog_id = catalog.id) }}">View page in JSON</a>		
+		{% endif %}
 	</div>
-	
+	{# end show items #}
+
+	<div class="row text-right">
+			<a href="#top">Back to top</a> |
+			<a href="{{ url_for('oneCatalogJSON', catalog_id = catalog.id) }}">View page in JSON</a>
+	</div>
+
 {% endblock %}
