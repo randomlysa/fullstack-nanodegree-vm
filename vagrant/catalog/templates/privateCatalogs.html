@@ -2,15 +2,15 @@
 {% block content %}
 {% include "header.html" %}
 	privateCatalogs
-	<div class="row banner main">		
+	<div class="row banner main">
 		<div class="col-md-12">
-			<h1>Catalogs</h1>			
-		</div>		
+			<h1>Catalogs</h1>
+		</div>
 	</div>
 
 	<div class="row">
 	{% with messages = get_flashed_messages() %}
-		{% if messages %}          
+		{% if messages %}
 			<ul class="flash">
 				{% for message in messages %}
 					<li> <strong> {{ message }} </strong> </li>
@@ -19,8 +19,8 @@
 		{% endif %}
 	{% endwith %}
 	</div>
-	
-	<div class="row padding-top padding-bottom">		
+
+	<div class="row padding-top padding-bottom">
 		<div class="col-md-12 text-center">
 			<a href="{{url_for('newCatalog')}}">
 				<button type="button" class="btn btn-lg" id="new-catalog">
@@ -32,20 +32,20 @@
 
 	<div class="grid js-isotope" data-isotope-options='{ "itemSelector": ".grid-item", "layoutMode": "fitRows" }'>
 	{% for catalog in catalogs %}
-		<div class="grid-item">
+		<div class="grid-item-catalogs">
 			<a href="{{url_for('showCatalog', catalog_id = catalog.id)}}">
 				<h3 class="catalog-name">{{catalog.name}}</h3>
 				{% if catalog.header_image_tn %}
 					<img src="{{ url_for('show_file', id = catalog.id, type = 'header_image_tn') }}" class="img-responsive img-rounded center-block">
 				{% endif %}
-			</a>	
+			</a>
 		</div>
 	{% endfor %}
 	</div>
 	<br clear="all">
-	
+
 	<div class="row text-right">
-		<a href="#top">Back to top</a> | 
+		<a href="#top">Back to top</a> |
 		<a href="{{ url_for('allCatalogsJSON') }}">View page in JSON</a>
 	</div>
 {% endblock %}
