@@ -34,10 +34,12 @@
 				
 				<div class="form-group">
 					<h3><label for="use-thumnail">Use cropped thumbnail or resized original:</h3>
-					<input type="radio" name="catalog_image_type" value="item_image_tn">
-						Keep all images the same size - used cropped portrait thumbnail <br />
-					<input type="radio" name="catalog_image_type" value="item_image">
-						Use resized original image - portrait images will be taller than landscape
+					<input type="radio" name="catalog_image_type" value="item_image_tn" 
+						{% if catalog.catalog_image_type ==  'item_image_tn' %} checked {% endif %} >
+						Use thumbnails with links to the original image. <br /><em>Portrait oriented image thumbnails are cropped so all thumbnails are the same size.</em><br />
+					<input type="radio" name="catalog_image_type" value="item_image"
+						{% if catalog.catalog_image_type ==  'item_image' %} checked {% endif %} >
+						Use full size images. Portrait oriented images will be taller than landscape oriented images.
 				
 				<div class="form-group">
 					<h3><label for="upload">Upload a header image:</label></h3>
