@@ -1,6 +1,10 @@
 {% extends "main.html" %}
+{% block navbar %}
+	{% include 'navbar.html' %}
+{% endblock %}
+
 {% block content %}
-{% include "header.html" %}
+
 	<!-- color picker from jscolor.com -->
 	<script src="{{ url_for('static', filename='jscolor.min.js') }}"></script>
 	<script>
@@ -11,7 +15,7 @@
 				$ ( 'h1' ).css('color', '#' + setColor);
 			});
 		});
-	
+
 	</script>
 	<div class="row banner menu">
 		<div class="row banner menu img-rounded" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header_image') }}')">
@@ -20,23 +24,23 @@
 	</div>
 	<div class="row">
 		<div class="col-md-6 col-md-offset-1 padding-top">
-		
+
 			<form action="#" method = "post" enctype="multipart/form-data" >
 				<div class="form-group">
 					<h3 ><label for="name">Rename the catalog:</label></h3>
 					<input type="text" class="form-control" name="name" value="{{catalog.name }}">
 				</div>
-				
+
 				<div class="form-group">
 					<h3><label for="header-color">Change header color:</label></h3>
 					<input class="jscolor" type="text" name="header_color" maxlength="6" value="{{catalog.header_color}}">
 				</div>
-				
+
 				<div class="form-group">
 					<h3><label for="use-thumnail">Select catalog type:</h3>
 					<div data-toggle="buttons">
 						<label class="btn btn-primary btn-block">
-							<input type="radio" name="catalog_image_type" value="item_image_tn" 
+							<input type="radio" name="catalog_image_type" value="item_image_tn"
 								{% if catalog.catalog_image_type ==  'item_image_tn' %} checked {% endif %} >
 							Use thumbnails with links to the original image. <br><em>Portrait oriented image thumbnails are cropped so all thumbnails are the same size.</em>
 						</label>
@@ -46,7 +50,7 @@
 							Use full size images. <br><em>Portrait oriented images will be taller than landscape oriented images.</em>
 						</label>
 					</div>
-				
+
 				<div class="form-group">
 					<h3><label for="upload">Upload a header image:</label></h3>
 					{# browse button #}
@@ -64,7 +68,7 @@
 					</a>
 				</div>
 			</form>
-			
+
 		</div>
 	</div>
 {% endblock %}

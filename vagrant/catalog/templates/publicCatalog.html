@@ -1,6 +1,10 @@
 {% extends "main.html" %}
+{% block navbar %}
+	{% include 'navbar.html' %}
+{% endblock %}
+
 {% block content %}
-{% include "header.html" %}
+
 	publicCatalog
 	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header_image') }}')">
 		<div>

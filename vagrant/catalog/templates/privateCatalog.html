@@ -1,6 +1,9 @@
 {% extends "main.html" %}
+{% block navbar %}
+	{% include 'navbar.html' %}
+{% endblock %}
+
 {% block content %}
-{% include "header.html" %}
 	privateCatalog
 	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header_image') }}')">
 		<div>
@@ -26,7 +29,8 @@
 	</div>
 
 
-	{# dropdown menu #}
+	{# dropdown menu -- moved to navbar #}
+	<!--
 		<button type="button" class="btn btn-xs dropdown-toggle"
 			data-toggle="collapse" data-target="#ownerMenu" aria-haspopup="true" aria-expanded="false">
 			Show/Hide Owner Menu<span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
@@ -53,6 +57,8 @@
 				</a>
 			</div>
 		</div>
+	-->
+	{# end dropdown menu #}
 
 	{# if there are no items, suggest the user makes one #}
 	{% if not items %}
@@ -114,10 +120,11 @@
 	</div>
 	{# end show items #}
 
-	<div class="row text-right">
+	<div class="navbar text-right">
+		<div class="container-fluid">
 			<a href="#top">Back to top</a> |
 			<a href="{{url_for('showCatalogs')}}">Show All Catalogs</a> |
 			<a href="{{ url_for('oneCatalogJSON', catalog_id = catalog.id) }}">View page in JSON</a>
+		</div>
 	</div>
-
 {% endblock %}
