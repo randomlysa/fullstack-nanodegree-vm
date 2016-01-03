@@ -34,9 +34,9 @@
 	</div>
 
 	
-	<div id="grid" data-columns>
+	<div class="grid js-isotope" data-isotope-options='{ "itemSelector": ".grid-item", "layoutMode": "fitRows" }'>
 	{% for catalog in catalogs %}
-		<div>
+		<div class="grid-item">
 			<a href="{{url_for('showCatalog', catalog_id = catalog.id)}}">
 				<h3 class="catalog-name">{{catalog.name}}</h3>
 				{% if catalog.header_image_tn %}
