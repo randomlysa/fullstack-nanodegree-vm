@@ -24,16 +24,6 @@
 	{% endwith %}
 	</div>
 
-	<div class="row padding-top padding-bottom">
-		<div class="col-md-12 text-center">
-			<a href="{{url_for('newCatalog')}}">
-				<button type="button" class="btn btn-lg" id="new-catalog">
-					<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add Catalog
-				</button>
-			</a>
-		</div>
-	</div>
-
 	<div class="grid js-isotope" data-isotope-options='{ "itemSelector": ".grid-item", "layoutMode": "fitRows" }'>
 	{% for catalog in catalogs %}
 		<div class="grid-item-catalogs">

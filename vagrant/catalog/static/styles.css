@@ -156,7 +156,8 @@ h3 {
 	list-style-type: none;
 	text-align: center;
 }
-.container {
+.content{
+	margin-top: 65px;
 	margin-bottom: 30px;
 }
 
