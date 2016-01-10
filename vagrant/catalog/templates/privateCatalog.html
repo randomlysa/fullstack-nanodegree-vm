@@ -122,7 +122,12 @@
 										</div>
 									</h3>
 
-									<p>{{i.description}}</p>
+									{# only show the description if the image is full size.
+										the thumbnail version will show a description when a link is clicked for the full size image #}
+									{% if catalog.catalog_image_type == 'item_image' %}
+										<p>{{i.description}}</p>
+									{% endif %}
+
 
 								{% if i.item_image %}
 									<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}"
