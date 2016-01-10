@@ -80,8 +80,22 @@
 	{% endif %}
 
 	{# begin show items #}
+	<script>
+		$(document).ready( function() {
+			// init Isotope after all images have loaded
+			var $grid = $('.grid').imagesLoaded( function() {
+				$grid.isotope({
+					itemSelector: '.grid-item-catalog',
+					percentPosition: true,
+					masonry: {
+						columnWidth: '.grid-sizer'
+					}
+				});
+			});
+		});
+	</script>
 	<div class="grid js-isotope"
-		data-isotope-options='{ "itemSelector": ".grid-item-catalog", "layoutMode": "masonry"}'>
+		data-isotope-options='{ "itemSelector": ".grid-item-catalog", "layoutMode": "fitRows"}'>
 		{% if items !=[] %}
 				{% for i in items %}
 					{# select which class to use - thumbnails or full size images #}
@@ -119,6 +133,14 @@
 		{% endif %}
 	</div>
 	{# end show items #}
+	<script>
+	var $grid = $('.grid').imagesLoaded( function() {
+		// init Isotope after all images have loaded
+		$grid.isotope({
+			// options...
+		});
+	});
+	</script>
 
 	<div class="navbar text-right">
 		<div class="container-fluid">

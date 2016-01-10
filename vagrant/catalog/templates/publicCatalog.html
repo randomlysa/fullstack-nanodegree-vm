@@ -4,7 +4,6 @@
 {% endblock %}
 
 {% block content %}
-
 	publicCatalog
 	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header_image') }}')">
 		<div>
@@ -50,8 +49,22 @@
 	{% endif %}
 
 	{# begin show items #}
+	<script>
+		$(document).ready( function() {
+			// init Isotope after all images have loaded
+			var $grid = $('.grid').imagesLoaded( function() {
+				$grid.isotope({
+					itemSelector: '.grid-item-catalog',
+					percentPosition: true,
+					masonry: {
+						columnWidth: '.grid-sizer'
+					}
+				});
+			});
+		});
+	</script>
 	<div class="grid js-isotope"
-		data-isotope-options='{ "itemSelector": ".grid-item-catalog", "layoutMode": "masonry"}'>
+		data-isotope-options='{ "itemSelector": ".grid-item-catalog", "layoutMode": "fitRows"}'>
 		{% if items !=[] %}
 				{% for i in items %}
 					{# select which class to use - thumbnails or full size images #}
