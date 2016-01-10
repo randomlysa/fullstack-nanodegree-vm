@@ -64,7 +64,7 @@ def makeThumbnail(path, imageExtension):
     original.thumbnail(size)
 
     if newHeight > 231:
-        # image is portrait orientation. crop the height 231 
+        # image is portrait orientation. crop the height 231
         print "cropping" + imageName
         crop = original.crop((0,0,350,231))
         newTnName = imageName + "-tn.jpg"
@@ -358,7 +358,7 @@ def allowed_file(filename):
 # def show_file(filename):
 def show_file(id, type):
     if type == 'header_image' or type == 'header_image_tn':
-        catalog = session.query(Catalog).filter_by(id=id).one()        
+        catalog = session.query(Catalog).filter_by(id=id).one()
         try:
             if type == 'header_image':
                 filename = catalog.header_image
@@ -513,7 +513,7 @@ def editCatalog(catalog_id):
         if request.form['name']:
             editedCatalog.name = request.form['name']
 
-        # update catalog_image_type 
+        # update catalog_image_type
         if request.form['catalog_image_type']:
             editedCatalog.catalog_image_type = \
                 request.form['catalog_image_type']
@@ -571,7 +571,8 @@ def showCatalog(catalog_id):
     else:
         return render_template(
                         'privateCatalog.html', items=items,
-                        catalog=catalog, creator=creator
+                        catalog=catalog, creator=creator,
+                        loggedInUser=login_session['user_id']
         )
 
 
@@ -609,7 +610,7 @@ def newCatalogItem(catalog_id):
                         description=request.form['description'],
                         item_image=filename,
                         item_image_tn=item_image_tn,
-                        catalog_id=catalog_id, 
+                        catalog_id=catalog_id,
                         user_id=catalog.user_id
             )
         # end of image upload section
@@ -660,7 +661,7 @@ def editCatalogItem(catalog_id, item_id):
                 + "." + extension
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFilename))
-            
+
             # make sure to update the renamed filename in the database
             editedItem.item_image = newFilename
             editedItem.item_image_tn = \
