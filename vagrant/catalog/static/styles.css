@@ -207,19 +207,24 @@ h3 {
 
 old style - delete if I like the new style */
 
+/*
+	grid-item-catalogs is the list of catalogs
+	grid-item-catalog is an individual catalog
+*/
+
 @media screen and (max-width: 640px){
-	.grid-item-catalogs {
+	.grid-item-catalogs, .grid-item-catalog {
 		width: 99%;
 	}
 }
 
 @media screen and (min-width: 641px) and (max-width: 1159px) {
-	.grid-item-catalogs {
+	.grid-item-catalogs, .grid-item-catalog {
 		width: 49%;
 	}
 }
 @media screen and (min-width: 1160px) {
-	.grid-item-catalogs {
+	.grid-item-catalogs, .grid-item-catalog {
 		width: 33%;
 	}
 }
