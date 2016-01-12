@@ -75,29 +75,28 @@
 							<div class="grid-item-catalog grid-item-catalog-img">
 						{% endif %}
 					{# end class select #}
-									<h3>
-										{{i.name}}
 
-										<div class="btn-group">
-											<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-												<span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
-											</button>
-											<ul class="dropdown-menu">
-												<li><a href="{{url_for('menuItemJSON', catalog_id = catalog.id, item_id = i.id)}}">View JSON</a></li>
-											</ul>
-										</div>
-									</h3>
+					{% if i.item_image %}
+						<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}"
+						class="img-responsive img-rounded">
+						{% endif %}
 
-									{# only show the description if the image is full size.
-										the thumbnail version will show a description when a link is clicked for the full size image #}
-									{% if catalog.catalog_image_type == 'item_image' %}
-										<p>{{i.description}}</p>
-									{% endif %}
+						<h3>
+							{{i.name}}
 
-								{% if i.item_image %}
-									<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}"
-									class="img-responsive img-rounded">
-								{% endif %}
+							<div class="btn-group">
+								<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li><a href="{{url_for('menuItemJSON', catalog_id = catalog.id, item_id = i.id)}}">View JSON</a></li>
+								</ul>
+							</div>
+						</h3>
+
+							<p>{{i.description}}</p>
+
+
 					</div>
 				{% endfor %}
 		{% endif %}
