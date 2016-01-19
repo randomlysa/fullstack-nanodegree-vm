@@ -18,3 +18,5 @@ vagrant/catalog/examples/restaurantmenu.db
 vagrant/catalog/examples/restaurantmenuwithusers.db
 vagrant/catalog/pg_config.sh
 vagrant/catalog/uploads/*
+vagrant - Copy/*
+vagrant/Vagrantfile

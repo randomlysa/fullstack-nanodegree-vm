@@ -41,6 +41,17 @@
 	</div>
 	<br clear="all">
 
+	{# isotope fix image sizing #}
+	<script>
+	var $grid = $('.grid').imagesLoaded( function() {
+		// init Isotope after all images have loaded
+		$grid.isotope({
+			// options...
+		});
+	});
+	</script>
+	{# end isotope section #}
+
 	<div class="row text-right">
 		<a href="#top">Back to top</a> |
 		<a href="{{ url_for('allCatalogsJSON') }}">View page in JSON</a>
