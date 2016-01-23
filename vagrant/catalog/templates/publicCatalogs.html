@@ -13,7 +13,7 @@
 		</div>
 	</div>
 	-->
-	
+
 	<div class = 'flash'>
 		      {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -29,7 +29,8 @@
 	</div>
 
 
-	<div class="grid js-isotope" data-isotope-options='{ "itemSelector": ".grid-item-catalogs", "layoutMode": "fitRows" }'>
+	<div class="grid js-isotope"
+		data-isotope-options='{ "itemSelector": ".grid-item-catalogs", "layoutMode": "fitRows" }'>
 	{% for catalog in catalogs %}
 		<div class="grid-item-catalogs">
 			<a href="{{url_for('showCatalog', catalog_id = catalog.id)}}">
