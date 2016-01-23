@@ -84,6 +84,9 @@ def showLogin():
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
+@app.route('/fblogin')
+def fblogin():
+    return render_template('fblogin.html')
 
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
@@ -94,10 +97,10 @@ def fbconnect():
     access_token = request.data
     print "access token received %s " % access_token
 
-    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
-        'web']['app_id']
-    app_secret = json.loads(
-        open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    # app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
+    # app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    app_id = '982663518456759'
+    app_secret = 'c2e62854bbab79dab6cf56ed07d9385d'
     url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
         app_id, app_secret, access_token)
     h = httplib2.Http()
