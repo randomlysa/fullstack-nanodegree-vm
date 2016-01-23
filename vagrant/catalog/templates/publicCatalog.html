@@ -37,36 +37,28 @@
 		</div>
 	{% endif %}
 
+	{# hide the header if there are no items #}
 	{% if items %}
 		<h2>Items</h2>
 	{% endif %}
 
 	{# begin show items #}
-	<script>
-		$(document).ready( function() {
-			// init Isotope after all images have loaded
-			var $grid = $('.grid').imagesLoaded( function() {
-				$grid.isotope({
-					itemSelector: '.grid-item-catalog',
-					percentPosition: true,
-					masonry: {
-						columnWidth: '.grid-sizer'
-					}
-				});
-			});
-		});
-	</script>
+	{# set some variables #}
+		{% if catalog.catalog_image_type == 'item_image_tn' %}
+			{% set setItemSelector = "grid-item-catalog-tn" %}
+		{% endif %}
+
+		{% if catalog.catalog_image_type == 'item_image' %}
+			{% set setItemSelector = "grid-item-catalog-img" %}
+		{% endif %}
+	{# end variables ... i thought there'd be more #}
+
 	<div class="grid js-isotope"
-		data-isotope-options='{ "itemSelector": ".grid-item-catalog", "layoutMode": "fitRows"}'>
+		data-isotope-options='{ "itemSelector": ".{{setItemSelector}}", "layoutMode": "fitRows"}'>
 		{% if items !=[] %}
 				{% for i in items %}
 					{# select which class to use - thumbnails or full size images #}
-						{% if catalog.catalog_image_type == 'item_image_tn' %}
-							<div class="grid-item-catalog grid-item-catalog-tn">
-						{% endif %}
-						{% if catalog.catalog_image_type == 'item_image' %}
-							<div class="grid-item-catalog grid-item-catalog-img">
-						{% endif %}
+							<div class="{{setItemSelector}}">
 					{# end class select #}
 
 					{% if i.item_image %}
@@ -113,12 +105,18 @@
 
 	{# isotope fix image sizing #}
 	<script>
-	var $grid = $('.grid').imagesLoaded( function() {
-		// init Isotope after all images have loaded
-		$grid.isotope({
-			// options...
+		$(document).ready( function() {
+			// init Isotope after all images have loaded
+			var $grid = $('.grid').imagesLoaded( function() {
+				$grid.isotope({
+					itemSelector: '.{{setItemSelector}}',
+					percentPosition: true,
+					masonry: {
+						columnWidth: '.grid-sizer'
+					}
+				});
+			});
 		});
-	});
 	</script>
 	{# end isotope section #}
 

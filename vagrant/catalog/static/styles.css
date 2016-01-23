@@ -161,76 +161,26 @@ h3 {
 	margin-bottom: 30px;
 }
 
-/* These are the classes that are going to be applied: */
-/* old style - delete if I like the new style
 
 @media screen and (max-width: 640px){
-	#grid[data-columns]::before {
-		content: '1 .column.size-1of1';
-	}
-}
-
-@media screen and (min-width: 641px) and (max-width: 1159px) {
-	#grid[data-columns]::before {
-		content: '2 .column.size-1of2';
-	}
-}
-@media screen and (min-width: 1160px) {
-	#grid[data-columns]::before {
-		content: '3 .column.size-1of3';
-	}
-}
-
-.column {
-	float: left;
-   position: relative;
-   width: 100%;
-}
-
-.size-1of3 {
-	text-align: center;
-	width: 33.333%;
-	padding: 25px;
-}
-
-.size-1of2 {
-	text-align: center;
-	width: 49%;
-	padding: 25px;
-}
-
-.size-1of1 {
-	text-align: center;
-	width: 99%;
-	padding: 25px;
-}
-
-old style - delete if I like the new style */
-
-/*
-	grid-item-catalogs is the list of catalogs
-	grid-item-catalog is an individual catalog
-*/
-
-@media screen and (max-width: 640px){
-	.grid-item-catalogs, .grid-item-catalog {
+	.grid-item-catalog-tn, .grid-item-catalogs {
 		width: 99%;
 	}
 }
 
 @media screen and (min-width: 641px) and (max-width: 1159px) {
-	.grid-item-catalogs, .grid-item-catalog {
+	.grid-item-catalog-tn, .grid-item-catalogs {
 		width: 49%;
 	}
 }
 @media screen and (min-width: 1160px) {
-	.grid-item-catalogs, .grid-item-catalog {
+	.grid-item-catalog-tn, .grid-item-catalogs {
 		width: 33%;
 	}
 }
 
 .grid-item-catalogs {
-	padding: 15px;
+	padding: 0px;
 	text-align: center;
 	float: left;
 	position: relative;
@@ -246,22 +196,15 @@ old style - delete if I like the new style */
     filter: alpha(opacity=70);
 }
 
-/* style for privateCatalog, publicCatalog */
-.grid-item-catalog {
-	text-align: center;
-	margin: 2px;
-	padding: 2px;
-}
-
+/* style for privateCatalog, publicCatalog thumbnails */
 .grid-item-catalog-tn {
-	width: 32%;
+	padding: 0px;
+	text-align: center;
 }
 
+
+/* use large images for catalog-img */
 .grid-item-catalog-img {
 	width: 99%;
 	margin-bottom: 25px;
-}
-
-.item-description {
-	height: 30px;
 }
