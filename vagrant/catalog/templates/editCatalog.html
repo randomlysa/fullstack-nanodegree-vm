@@ -42,12 +42,12 @@
 						<label class="btn btn-primary btn-block {% if catalog.catalog_image_type ==  'item_image_tn' %} active {% endif %} >">
 							<input type="radio" name="catalog_image_type" value="item_image_tn"
 								{% if catalog.catalog_image_type ==  'item_image_tn' %} checked {% endif %} >
-							Use thumbnails with links to the original image. <br><em>Portrait oriented image thumbnails are cropped so all thumbnails are the same size.</em>
+							Use thumbnails with links to full size images. <br />
 						</label>
 						<label class="btn btn-primary btn-block {% if catalog.catalog_image_type ==  'item_image' %} active {% endif %} >">
 							<input type="radio" name="catalog_image_type" value="item_image"
 								{% if catalog.catalog_image_type ==  'item_image' %} checked {% endif %} >
-							Use full size images. <br><em>Portrait oriented images will be taller than landscape oriented images.</em>
+							Use full-size image - no thumbnails or links.
 						</label>
 					</div>
 
