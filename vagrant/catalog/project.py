@@ -63,6 +63,8 @@ def makeThumbnail(path, imageExtension):
     size = (newWidth, newHeight)
     original.thumbnail(size)
 
+    '''
+    canceling the idea of cropped thumbnails for now
     if newHeight > 231:
         # image is portrait orientation. crop the height 231
         print "cropping" + imageName
@@ -70,9 +72,11 @@ def makeThumbnail(path, imageExtension):
         newTnName = imageName + "-tn.jpg"
         crop.save(os.path.join(app.config['UPLOAD_FOLDER'], newTnName))
     else:
-        newTnName = imageName + "-tn.jpg"
-        original.save(os.path.join(app.config['UPLOAD_FOLDER'], newTnName))
-        # im.save(file + "-tn.", "jpg")
+    '''
+
+    newTnName = imageName + "-tn.jpg"
+    original.save(os.path.join(app.config['UPLOAD_FOLDER'], newTnName))
+    # im.save(file + "-tn.", "jpg")
     return newTnName
 
 # Create anti-forgery state token
