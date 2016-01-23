@@ -46,20 +46,23 @@ session = DBSession()
 def error():
     return render_template('error.html')
 
+
 def makeThumbnail(path, imageExtension):
     try:
         # os.path.join(app.config['UPLOAD_FOLDER'], newFilename)
-        original = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], imageExtension))
+        original = Image.open(
+            os.path.join(app.config['UPLOAD_FOLDER'], imageExtension)
+        )
     except:
         print "image doesn't exist"
 
     # split name from extension
     imageName = imageExtension.rsplit('.', 1)[0]
 
-    width, height = original.size # ex 800x600
-    ratio = float(height) / width # ex: 0.75
+    width, height = original.size  # ex 800x600
+    ratio = float(height) / width  # ex: 0.75
     newWidth = 400
-    newHeight = width * ratio # 262.5 = 350 * 0.75
+    newHeight = width * ratio  # 262.5 = 350 * 0.75
     size = (newWidth, newHeight)
     original.thumbnail(size)
 
@@ -79,6 +82,7 @@ def makeThumbnail(path, imageExtension):
     # im.save(file + "-tn.", "jpg")
     return newTnName
 
+
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
@@ -88,9 +92,11 @@ def showLogin():
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
+
 @app.route('/fblogin')
 def fblogin():
     return render_template('fblogin.html')
+
 
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
@@ -373,7 +379,7 @@ def show_file(id, type):
                 filename = catalog.header_image_tn
             return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
         except:
-            return filename + " : file does not exist" # use random file provided
+            return filename + " : file does not exist"  # use random file provided
 
     if type == 'item_image' or type == 'item_image_tn':
         item = session.query(CatalogItem).filter_by(id=id).one()
@@ -384,7 +390,7 @@ def show_file(id, type):
                 filename = item.item_image_tn
             return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
         except:
-            return "file does not exist" # use random file provided
+            return "file does not exist"  # use random file provided
     else:
         print "there is a problem"
 
@@ -459,7 +465,7 @@ def newCatalog():
         session.commit()
         # return redirect(url_for('showCatalogs'))
         # send the user to the catalog that was just made
-        return redirect(url_for('showCatalog', catalog_id = lastCatalog.id))
+        return redirect(url_for('showCatalog', catalog_id=lastCatalog.id))
     else:
         return render_template('newCatalog.html')
 
@@ -551,7 +557,9 @@ def deleteCatalog(catalog_id):
         .filter_by(catalog_id=catalogToDelete.id)
     if request.method == 'POST':
         for deleteThis in catalogItemsToDelete:
-            os.remove("/vagrant/catalog/uploads/photos/" + deleteThis.item_image)
+            os.remove(
+                "/vagrant/catalog/uploads/photos/" + deleteThis.item_image
+            )
             session.delete(deleteThis)
         session.delete(catalogToDelete)
         flash('Catalog \'%s\' Successfully Deleted' % catalogToDelete.name)
@@ -610,7 +618,9 @@ def newCatalogItem(catalog_id):
                 str(catalog_id) + "_item" + str(nextId) + "." + extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-            item_image_tn = makeThumbnail(app.config['UPLOAD_FOLDER'], filename)
+            item_image_tn = makeThumbnail(
+                app.config['UPLOAD_FOLDER'], filename
+            )
 
             newItem = CatalogItem(
                         name=request.form['name'],
@@ -634,7 +644,10 @@ def newCatalogItem(catalog_id):
         flash('New Item \'%s\' Successfully Created' % (newItem.name))
         return redirect(url_for('showCatalog', catalog_id=catalog_id))
     else:
-        return render_template('newCatalogItem.html', catalog_id=catalog_id, catalog_name = catalog.name)
+        return render_template(
+            'newCatalogItem.html',
+            catalog_id=catalog_id, catalog_name=catalog.name
+        )
 
 
 # Edit a catalog item
@@ -691,6 +704,7 @@ def editCatalogItem(catalog_id, item_id):
                 item_id=item_id, item=editedItem
         )
 
+
 # set item as catalog thumbnail
 @app.route('/catalog/<int:catalog_id>/item/<int:item_id>/setItemAsThumb')
 def setItemAsThumb(catalog_id, item_id):
@@ -710,6 +724,7 @@ def setItemAsThumb(catalog_id, item_id):
 
     # return to list of catalogs so you can see the new thumbnail
     return redirect(url_for('showCatalogs'))
+
 
 # Delete a catalog item
 @app.route(
@@ -731,7 +746,9 @@ def deleteCatalogItem(catalog_id, item_id):
         print "in the post"
         if itemToDelete.item_image:
             print "image to delete: " + itemToDelete.item_image
-            os.remove("/vagrant/catalog/uploads/photos/" + itemToDelete.item_image)
+            os.remove(
+                "/vagrant/catalog/uploads/photos/" + itemToDelete.item_image
+            )
         # end delete image
         session.delete(itemToDelete)
         session.commit()
