@@ -58,19 +58,20 @@
 		{% if items !=[] %}
 				{% for i in items %}
 					{# select which class to use - thumbnails or full size images #}
-							<div class="{{setItemSelector}}">
+						<div class="{{setItemSelector}}">
 					{# end class select #}
 
 					{% if i.item_image %}
 						{# if the image is a thumbnail, make a link to the full size image #}
-						{% if catalog.catalog_image_type == "item_image_tn" %}
-							<a class="gallery" data-featherlight="image" href="{{ url_for('show_file', id = i.id, type = 'item_image') }}" >
-						{% endif %}
+							{% if catalog.catalog_image_type == "item_image_tn" %}
+								<a class="gallery" data-featherlight="image" href="{{ url_for('show_file', id = i.id, type = 'item_image') }}" >
+							{% endif %}
 						{# end make link for thumbnail #}
 
 						<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}"
 						class="img-responsive img-rounded">
-						{% endif %}
+					{% endif %}
+								</a>
 
 						<h3>
 							{{i.name}}
@@ -84,11 +85,8 @@
 								</ul>
 							</div>
 						</h3>
-
 							<p>{{i.description}}</p>
-
-
-					</div>
+						</div>
 				{% endfor %}
 		{% endif %}
 	</div>
