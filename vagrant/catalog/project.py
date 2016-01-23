@@ -403,7 +403,7 @@ def showCatalogs():
     else:
         user = getUserInfo(login_session['user_id'])
         return render_template(
-            'privateCatalogs.html', catalogs=catalogs, currentUser=user
+            'privateCatalogs.html', catalogs=catalogs, loggedInUser=user
         )
 
 
