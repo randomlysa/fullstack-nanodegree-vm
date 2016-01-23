@@ -691,6 +691,25 @@ def editCatalogItem(catalog_id, item_id):
                 item_id=item_id, item=editedItem
         )
 
+# set item as catalog thumbnail
+@app.route('/catalog/<int:catalog_id>/item/<int:item_id>/setItemAsThumb')
+def setItemAsThumb(catalog_id, item_id):
+    if 'username' not in login_session:
+        return redirect('/login')
+    catalog = session.query(Catalog).filter_by(id=catalog_id).one()
+    # itemToDelete = session.query(CatalogItem).filter_by(id=item_id).one()
+
+    # check if the user logged in is the item owner
+    if catalog.user_id != login_session['user_id']:
+        return redirect('/error')
+
+    print item_id
+    catalog.catalog_thumbnail = item_id
+    session.add(catalog)
+    session.commit()
+
+    # return to list of catalogs so you can see the new thumbnail
+    return redirect(url_for('showCatalogs'))
 
 # Delete a catalog item
 @app.route(
