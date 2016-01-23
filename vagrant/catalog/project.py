@@ -58,7 +58,7 @@ def makeThumbnail(path, imageExtension):
 
     width, height = original.size # ex 800x600
     ratio = float(height) / width # ex: 0.75
-    newWidth = 350
+    newWidth = 400
     newHeight = width * ratio # 262.5 = 350 * 0.75
     size = (newWidth, newHeight)
     original.thumbnail(size)
