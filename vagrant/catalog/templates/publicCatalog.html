@@ -64,12 +64,16 @@
 					{% if i.item_image %}
 						{# if the image is a thumbnail, make a link to the full size image #}
 							{% if catalog.catalog_image_type == "item_image_tn" %}
-								<a class="gallery" data-featherlight="image" href="{{ url_for('show_file', id = i.id, type = 'item_image') }}" >
+								<a
+									data-lightbox="gallery"
+									data-title="{{i.name}}"
+									href="{{ url_for('show_file', id = i.id, type = 'item_image') }}"
+									>
 							{% endif %}
 						{# end make link for thumbnail #}
 
-						<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}"
-						class="img-responsive img-rounded">
+							<img src="{{ url_for('show_file', id = i.id, type = catalog.catalog_image_type) }}"
+								class="img-responsive img-rounded">
 					{% endif %}
 								</a>
 
@@ -91,15 +95,6 @@
 		{% endif %}
 	</div>
 	{# end show items #}
-
-	{# featherlight #}
-	<script src="//cdn.rawgit.com/noelboss/featherlight/1.3.5/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="//cdn.rawgit.com/noelboss/featherlight/1.3.5/release/featherlight.gallery.min.js" type="text/javascript" charset="utf-8"></script>
-	<script>
-		$(document).ready(function(){
-			});
-		</script>
-	{# end featherlight #}
 
 	{# isotope fix image sizing #}
 	<script>
@@ -123,4 +118,8 @@
 		<a href="{{url_for('showCatalogs')}}">Show All Catalogs</a> |
 		<a href="{{ url_for('oneCatalogJSON', catalog_id = catalog.id) }}">View page in JSON</a>
 	</div>
+
+	{# lightbox #}
+		<script src="{{ url_for('static', filename='lightbox.min.js') }}"></script>
+	{# end lightbox #}
 {% endblock %}
