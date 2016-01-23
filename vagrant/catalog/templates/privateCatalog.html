@@ -118,7 +118,7 @@
 			// init Isotope after all images have loaded
 			var $grid = $('.grid').imagesLoaded( function() {
 				$grid.isotope({
-					itemSelector: '.grid-item-catalog',
+					itemSelector: '.{{setItemSelector}}',
 					percentPosition: true,
 					masonry: {
 						columnWidth: '.grid-sizer'
