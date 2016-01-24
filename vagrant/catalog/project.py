@@ -426,7 +426,10 @@ def newCatalog():
                 )
             '''
         newCatalog = Catalog(
-                name=request.form['name'], user_id=login_session['user_id']
+                name=request.form['name'],
+                user_id=login_session['user_id'],
+                header_color=request.form['header_color'],
+                catalog_image_type=request.form['catalog_image_type']
         )
 
         session.add(newCatalog)
