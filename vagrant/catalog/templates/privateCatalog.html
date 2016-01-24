@@ -92,7 +92,9 @@
 									<span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
 								</button>
 								<ul class="dropdown-menu">
-									<li><a href="{{url_for('setItemAsThumb', catalog_id = catalog.id, item_id = i.id)}}">Set as catalog thumbnail</a></li>
+									{% if i.item_image %}
+										<li><a href="{{url_for('setItemAsThumb', catalog_id = catalog.id, item_id = i.id)}}">Set as catalog thumbnail</a></li>
+									{% endif %}
 									<li><a href="{{url_for('menuItemJSON', catalog_id = catalog.id, item_id = i.id)}}">View JSON</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href='{{url_for('editCatalogItem', catalog_id = catalog.id, item_id=i.id ) }}'>Edit</a></li>
