@@ -52,7 +52,15 @@
 					</div>
 
 				<div class="form-group">
-					<h3><label for="upload">Upload a header image:</label></h3>
+					{% if catalog.header_image %}
+						<h3><label for="upload">Replace current header image:</label></h3>
+						<img
+							src="{{url_for('show_file', id=catalog.id, type='header_image_tn')}}"
+							class="img-reponsive center-block"
+							>
+					{% else %}
+						<h3><label for="upload">Upload header image:</label></h3>
+					{% endif %}
 					{# browse button #}
 					<input class="btn btn-lg btn-block" type='file' name='file'>
 					<p class="help-block">Recommended size 1200x150.</p>
