@@ -25,7 +25,7 @@ session.add(User1)
 session.commit()
 
 # Catalog Dallas Arboretum
-'''
+
 catalog1 = Catalog(
     user_id=1,
     name = "Dallas Arboretum",
@@ -37,7 +37,7 @@ catalog1 = Catalog(
 
 session.add(catalog1)
 session.commit()
-'''
+
 
 catalogItem1 = CatalogItem(
     user_id=1, 
