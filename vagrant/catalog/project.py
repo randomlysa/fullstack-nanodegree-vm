@@ -371,28 +371,24 @@ def allowed_file(filename):
 # def show_file(filename):
 def show_file(id, type):
     if type == 'header_image' or type == 'header_image_tn':
+        # get the catalog that we want the header image for
         catalog = session.query(Catalog).filter_by(id=id).one()
-        try:
-            if type == 'header_image':
-                filename = catalog.header_image
-            if type == 'header_image_tn':
-                filename = catalog.header_image_tn
-            return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-        except:
-            return filename + " : file does not exist"  # use random file provided
+
+        if type == 'header_image':
+            filename = catalog.header_image
+        if type == 'header_image_tn':
+            filename = catalog.header_image_tn
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
     if type == 'item_image' or type == 'item_image_tn':
+        # get the item that we want the image for
         item = session.query(CatalogItem).filter_by(id=id).one()
-        try:
-            if type == 'item_image':
-                filename = item.item_image
-            if type == 'item_image_tn':
-                filename = item.item_image_tn
-            return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-        except:
-            return "file does not exist"  # use random file provided
-    else:
-        print "there is a problem"
+
+        if type == 'item_image':
+            filename = item.item_image
+        if type == 'item_image_tn':
+            filename = item.item_image_tn
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 # Show all catalogs
@@ -560,6 +556,7 @@ def deleteCatalog(catalog_id):
         .filter_by(catalog_id=catalogToDelete.id)
     if request.method == 'POST':
         for deleteThis in catalogItemsToDelete:
+            print "removing" + deleteThis.item_image
             os.remove(
                 "/vagrant/catalog/uploads/photos/" + deleteThis.item_image
             )

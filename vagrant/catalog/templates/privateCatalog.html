@@ -4,8 +4,12 @@
 {% endblock %}
 
 {% block content %}
-	privateCatalog
-	<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header_image') }}')">
+	<!-- privateCatalog -->
+	{% if catalog.header_image %}
+		<div class="row banner menu" style="background-image: url('{{ url_for('show_file', id = catalog.id, type = 'header_image') }}')">
+	{% else %}
+		<div class="row banner menu">
+	{% endif %}
 		<div>
 			<h1 {% if catalog.header_color %}style="color: #{{catalog.header_color}};"{% endif %}>{{ catalog.name }}
 				<figure class="creator">
