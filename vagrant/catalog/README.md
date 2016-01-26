@@ -20,7 +20,8 @@ python project.py
 Access it in your browser:
 http://localhost:5000
 
-Using:
+# Using:
+
 PIL for creating thumbnails (apt-get install python-imaging)
 
 Isotope for image layout (http://isotope.metafizzy.co/)
