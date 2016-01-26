@@ -107,11 +107,9 @@ def fbconnect():
     access_token = request.data
     print "access token received %s " % access_token
 
-    # app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
-    # app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
     app_id = '982663518456759'
     app_secret = 'c2e62854bbab79dab6cf56ed07d9385d'
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (  # nopep8
         app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
@@ -139,7 +137,7 @@ def fbconnect():
     login_session['access_token'] = stored_token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token
+    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token  # nopep8
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -572,11 +570,11 @@ def deleteCatalog(catalog_id):
         # if there is a header image, delete the image and thumbnails
         if (catalogToDelete.header_image):
             os.remove(
-                "/vagrant/catalog/uploads/photos/" + \
+                    "/vagrant/catalog/uploads/photos/" +
                     catalogToDelete.header_image
             )
             os.remove(
-                "/vagrant/catalog/uploads/photos/" + \
+                    "/vagrant/catalog/uploads/photos/" +
                     catalogToDelete.header_image_tn
             )
         session.delete(catalogToDelete)
@@ -596,11 +594,14 @@ def showCatalog(catalog_id):
     creator = getUserInfo(catalog.user_id)
     items = session.query(CatalogItem).filter_by(
         catalog_id=catalog_id).all()
-    if 'username' not in login_session or creator.id != login_session['user_id']:
-        return render_template(
-                        'publicCatalog.html', items=items,
-                        catalog=catalog, creator=creator
-        )
+    # can't figure out why I'm getting a pep8 error here
+    if 'username' not in login_session \
+        or creator.id != login_session['user_id']:
+
+            return render_template(
+                            'publicCatalog.html', items=items,
+                            catalog=catalog, creator=creator
+            )
     else:
         return render_template(
                         'privateCatalog.html', items=items,
@@ -632,6 +633,7 @@ def newCatalogItem(catalog_id):
             except AttributeError:
                 nextId = 1
 
+            # rename the file to user[id]_catalo[id]_item[id].extension
             filename = "user" + str(login_session['user_id']) + "_catalog" + \
                 str(catalog_id) + "_item" + str(nextId) + "." + extension
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
