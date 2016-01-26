@@ -5,8 +5,8 @@
 
 {% block content %}
 
+<!--
 	privateCatalogs
-	<!--
 	<div class="row banner main">
 		<div class="col-md-12">
 			<h1>Catalogs</h1>
@@ -33,7 +33,7 @@
 			<a href="{{url_for('showCatalog', catalog_id = catalog.id)}}">
 				<h3 class="catalog-name">{{catalog.name}}</h3>
 				{# set the catalog thumbnail to be catalog.catalog_thumbnail unless it doesn't exist, then use catalog.header_image #}
-				{% if catalog.catalog_thumbnail %}					
+				{% if catalog.catalog_thumbnail %}
 					<img src="{{ url_for('show_file', id = catalog.catalog_thumbnail, type = 'item_image_tn') }}" class="img-responsive img-rounded center-block">
 				{% else %}
 					<img src="{{ url_for('show_file', id = catalog.id, type = 'header_image_tn') }}" class="img-responsive img-rounded center-block">

@@ -5,8 +5,8 @@
 
 {% block content %}
 
-	publicCatalogs
 	<!--
+	publicCatalogs
 	<div class="row banner main">
 		<div class="col-md-12">
 			<h1>Catalogs</h1>
@@ -41,7 +41,7 @@
 				{% elif catalog.header_image_tn %}
 					<img src="{{ url_for('show_file', id = catalog.id, type = 'header_image_tn') }}" class="img-responsive img-rounded center-block">
 				{% else %}
-					{# there is no image for the catalog thumnail!!! #}					
+					{# there is no image for the catalog thumnail!!! #}
 				{% endif %}
 			</a>
 		</div>
