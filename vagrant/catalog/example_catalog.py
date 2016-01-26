@@ -38,6 +38,10 @@ catalog1 = Catalog(
 session.add(catalog1)
 session.commit()
 
+# Example photos were taken by the author of this project, Sasha Afanasyev, 
+# and are available on flickr (https://www.flickr.com/photos/sasha55068)
+# under the creative commons Attribution-NonCommercial 2.0 Generic 
+# CC BY-NC 2.0) license. https://creativecommons.org/licenses/by-nc/2.0/
 
 catalogItem1 = CatalogItem(
     user_id=1, 
