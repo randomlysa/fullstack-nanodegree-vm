@@ -547,6 +547,7 @@ def deleteCatalog(catalog_id):
 
     catalogToDelete = session.query(
         Catalog).filter_by(id=catalog_id).one()
+
     # check if the user logged in is the catalog owner
     if catalogToDelete.user_id != login_session['user_id']:
         return redirect('/error')
@@ -559,6 +560,9 @@ def deleteCatalog(catalog_id):
             print "removing" + deleteThis.item_image
             os.remove(
                 "/vagrant/catalog/uploads/photos/" + deleteThis.item_image
+            )
+            os.remove(
+                "/vagrant/catalog/uploads/photos/" + deleteThis.item_image_tn
             )
             session.delete(deleteThis)
         session.delete(catalogToDelete)
