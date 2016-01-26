@@ -556,15 +556,26 @@ def deleteCatalog(catalog_id):
     catalogItemsToDelete = session.query(CatalogItem)\
         .filter_by(catalog_id=catalogToDelete.id)
     if request.method == 'POST':
+        # delete images and thumbnails from /uploads
         for deleteThis in catalogItemsToDelete:
-            print "removing" + deleteThis.item_image
             os.remove(
                 "/vagrant/catalog/uploads/photos/" + deleteThis.item_image
             )
             os.remove(
                 "/vagrant/catalog/uploads/photos/" + deleteThis.item_image_tn
             )
+            # delete items from the database
             session.delete(deleteThis)
+        # if there is a header image, delete the image and thumbnails
+        if (catalogToDelete.header_image):
+            os.remove(
+                "/vagrant/catalog/uploads/photos/" + \
+                    catalogToDelete.header_image
+            )
+            os.remove(
+                "/vagrant/catalog/uploads/photos/" + \
+                    catalogToDelete.header_image_tn
+            )
         session.delete(catalogToDelete)
         flash('Catalog \'%s\' Successfully Deleted' % catalogToDelete.name)
         session.commit()
